@@ -377,7 +377,7 @@ async function shareImage(){
   canvas.toBlob(async (blob) => {
     const file = new File([blob], "syllabus.png", { type: "image/png" });
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      try { await navigator.share({ files: [file], title: 'দৈনিক পাঠ্যসূচি', text: 'আজকের পাঠ্যসূচি' }); } catch(e){}
+      try { await navigator.share({ files: [file], title: 'দৈনিক পাঠ্যসূচি', text: ' ' }); } catch(e){}
     } else {
       const link = document.createElement('a');
       link.download = 'syllabus.png';
