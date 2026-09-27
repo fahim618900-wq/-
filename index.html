@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>দৈনিক পাঠ্যসূচি</title>
+<link href="https://fonts.googleapis.com/css2?family=Tiro+Bangla:ital@0;1&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#2563eb;
+  --blue-dark:#1d4ed8;
+  --blue-soft:#eef2ff;
+  --blue-light:#f5f8ff;
+  --ink:#1e293b;
+  --muted:#64748b;
+  --paper:#f1f5f9;
+  --white:#ffffff;
+  --line:1px;
+  --radius:14px;
+  --shadow:0 4px 14px rgba(15,23,42,.08);
+  --shadow-sm:0 2px 8px rgba(15,23,42,.06);
+}
+*{ box-sizing:border-box; font-family:'Tiro Bangla','Hind Siliguri',serif; }
+html,body{ background:var(--paper); }
+body{ margin:0; padding:18px; color:var(--ink); min-height:100%; }
+svg.icon{ width:18px; height:18px; flex-shrink:0; }
+
+/* ===== ফর্ম পেজ ===== */
+.box{ max-width:480px; margin:auto; font-family:'Hind Siliguri',sans-serif; }
+.eyebrow{ font-weight:600; font-size:13px; color:var(--blue); margin:0 0 4px 2px; letter-spacing:.3px; }
+h2{ font-size:25px; font-weight:700; margin:0 0 18px 2px; color:var(--ink); }
+
+.field{ background:var(--white); border:var(--line) solid #e2e8f0; border-radius:var(--radius);
+  box-shadow:var(--shadow-sm); padding:12px 14px; margin-bottom:14px; }
+label{ font-weight:600; font-size:13px; display:block; margin-bottom:6px; color:var(--ink); }
+select,input[type=date]{ width:100%; padding:9px 6px; border:none; border-bottom:1.5px solid #e2e8f0;
+  background:transparent; font-size:16px; font-weight:600; color:var(--ink);
+  font-family:'Hind Siliguri',sans-serif; transition:border-color .2s; }
+select:focus,input:focus{ outline:none; border-color:var(--blue); }
+
+.subject-row{ display:flex; align-items:center; gap:10px; margin-top:10px; }
+.subject-row label{ width:38%; margin:0; font-size:13px; font-weight:600; }
+.subject-input{ flex:1; padding:8px 6px; border:none; border-bottom:1.5px solid #e2e8f0; background:transparent;
+  font-size:14px; color:var(--ink); font-family:'Hind Siliguri',sans-serif; transition:border-color .2s; }
+.subject-input:focus{ outline:none; border-color:var(--blue); }
+
+#genBtn{ width:100%; padding:15px; border:none; border-radius:12px;
+  background:var(--blue); color:#fff; font-size:16px; font-weight:700; cursor:pointer; margin-top:6px;
+  box-shadow:0 4px 12px rgba(37,99,235,.25); display:flex; align-items:center; justify-content:center; gap:8px;
+  font-family:'Hind Siliguri',sans-serif; transition:background .2s, transform .1s; }
+#genBtn:hover{ background:var(--blue-dark); }
+#genBtn:active{ transform:scale(.99); }
+
+/* ===== প্রিভিউ পেজ ===== */
+#previewPage{ display:none; max-width:480px; margin:auto; }
+#cardViewport{ width:100%; position:relative; }
+
+.routine-card{ background:var(--white); border:1px solid #e2e8f0; border-radius:var(--radius);
+  box-shadow:var(--shadow); overflow:hidden; display:flex; flex-direction:column; }
+
+.header{
+  background:var(--blue-soft);
+  border-bottom:1px solid #e2e8f0;
+  padding:12px 16px;
+  text-align:center;
+  flex:0 0 auto;
+}
+.title{ font-size:19px; font-weight:700; color:var(--ink); margin-bottom:4px; line-height:1.2; }
+.class-banner{
+  display:inline-block; background:var(--white); color:var(--blue);
+  padding:3px 14px; border-radius:20px; font-size:14px; font-weight:600;
+  border:1px solid #c7d2fe;
+}
+
+.date-row{ flex:0 0 auto; display:flex; justify-content:space-between; align-items:center;
+  background:var(--white); padding:7px 16px; border-bottom:1px solid #eef2f7;
+  font-size:12px; font-family:'Hind Siliguri',sans-serif; color:var(--ink); }
+.date-row .label{ display:flex; align-items:center; gap:6px; font-weight:600; color:var(--blue); }
+.date-row .value{ font-weight:600; }
+
+.content-area{ flex:1 1 auto; padding:8px 14px; overflow:hidden; min-height:0; display:flex; }
+#tableWrap{ width:100%; overflow:hidden; align-self:stretch; }
+.routine-table{ width:100%; height:100%; border-collapse:collapse; table-layout:fixed; }
+.routine-table tr{ border-bottom:1px solid #eef2f7; }
+.routine-table tr:last-child{ border-bottom:none; }
+.routine-table td{ padding:4px 6px; vertical-align:top; line-height:1.35; word-break:break-word;
+  font-family:'Hind Siliguri',sans-serif; color:var(--ink); }
+.subject-cell{ width:36%; font-weight:700; color:var(--blue); }
+.lesson-cell{ width:64%; color:var(--ink); }
+
+.footer{
+  background:var(--blue-light);
+  border-top:1px solid #e2e8f0;
+  padding:9px 14px;
+  text-align:center;
+  font-family:'Hind Siliguri',sans-serif;
+  flex:0 0 auto;
+}
+.footer .institution{ font-size:13px; font-weight:700; color:var(--ink); margin-bottom:3px; }
+.footer .contact-line{ font-size:10px; color:var(--muted); line-height:1.5; }
+.footer .contact-line span{ margin:0 3px; }
+
+[contenteditable="true"]{ outline:none; border-radius:4px; padding:1px 3px; cursor:text; transition:background .15s; }
+[contenteditable="true"]:focus{ background:rgba(37,99,235,.10); box-shadow:0 0 0 2px rgba(37,99,235,.35); }
+
+.hint{ display:flex; align-items:center; justify-content:center; gap:6px; font-size:12px; color:var(--muted);
+  margin:10px 0 0; font-family:'Hind Siliguri',sans-serif; }
+
+.action-bar{ display:flex; gap:10px; margin-top:14px; }
+.action-bar button{ flex:1; padding:13px; border:none; border-radius:12px;
+  font-size:15px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center;
+  gap:7px; font-family:'Hind Siliguri',sans-serif; transition:background .2s, transform .1s, box-shadow .2s; }
+.action-bar button:active{ transform:scale(.98); }
+#downloadBtn{ background:var(--blue); color:#fff; box-shadow:0 4px 12px rgba(37,99,235,.25); }
+#downloadBtn:hover{ background:var(--blue-dark); }
+#shareBtn{ background:#fff; color:var(--ink); border:1px solid #e2e8f0; box-shadow:var(--shadow-sm); }
+#shareBtn:hover{ background:#f8fafc; }
+
+#backBtn{ width:100%; padding:11px; border:1px solid #e2e8f0; border-radius:12px; background:transparent;
+  color:var(--muted); font-size:14px; font-weight:600; cursor:pointer; margin-top:10px;
+  display:flex; align-items:center; justify-content:center; gap:6px; font-family:'Hind Siliguri',sans-serif;
+  transition:background .2s, color .2s; }
+#backBtn:hover{ background:#f8fafc; color:var(--ink); }
+</style>
+</head>
+<body>
+
+<div class="box" id="formPage">
+  <div class="eyebrow">নতুন এন্ট্রি</div>
+  <h2>দৈনিক পাঠ্যসূচি</h2>
+
+  <div class="field">
+    <label>শ্রেণি</label>
+    <select id="cls" onchange="loadSubjects()">
+      <option value="">-- শ্রেণি নির্বাচন করুন --</option>
+      <option>প্লে</option><option>নার্সারি</option><option>প্রথম</option><option>দ্বিতীয়</option>
+      <option>তৃতীয়</option><option>চতুর্থ</option><option>পঞ্চম</option><option>ষষ্ঠ</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label>তারিখ</label>
+    <input type="date" id="date">
+  </div>
+
+  <div class="field" id="subjectsField" style="display:none;">
+    <label>বিষয়ভিত্তিক পাঠ্যসূচি</label>
+    <div id="subjectsBox"></div>
+  </div>
+
+  <button id="genBtn" onclick="showPreview()">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+    প্রিভিউ দেখুন
+  </button>
+</div>
+
+<div id="previewPage">
+  <div id="cardViewport">
+    <div class="routine-card" id="card">
+      <div class="header">
+        <div class="title">দৈনিক পাঠ্যসূচি</div>
+        <div class="class-banner" contenteditable="true" id="editClass">শ্রেণি: </div>
+      </div>
+
+      <div class="date-row">
+        <span class="label">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+          তারিখ
+        </span>
+        <span class="value" contenteditable="true" id="editDate"></span>
+      </div>
+
+      <div class="content-area">
+        <div id="tableWrap"><table class="routine-table" id="previewTable"></table></div>
+      </div>
+
+      <div class="footer">
+        <div class="institution">দারুল হিকমাহ মডেল মাদ্রাসা</div>
+        <div class="contact-line">
+          ফুলপুর, ময়মনসিংহ <span>•</span> +৮৮০ ১৯৭০ ৫১৭৫৬৬ <span>•</span> dhmm.phulpur@gmail.com
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p class="hint">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+    যেকোনো লেখায় ক্লিক করে সরাসরি পরিবর্তন করুন
+  </p>
+
+  <div class="action-bar">
+    <button id="downloadBtn" onclick="downloadImage()">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+      ডাউনলোড
+    </button>
+    <button id="shareBtn" onclick="shareImage()">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="m7 8 5-5 5 5"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg>
+      শেয়ার
+    </button>
+  </div>
+
+  <button id="backBtn" onclick="backToForm()">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+    ফিরে যান
+  </button>
+</div>
+
+<script>
+const classSubjects = {
+  "প্লে": ["কোরআন", "আরবি", "গণিত", "ড্রইং", "বাংলা", "সাধারণ জ্ঞান"],
+  "নার্সারি": ["গণিত", "ড্রইং", "বাংলা", "সাধারণ জ্ঞান", "কোরআন", "ইংরেজি"],
+  "প্রথম": ["ইংরেজি", "কোরআন", "গণিত", "কম্পিউটার", "আরবি", "বাংলা", "সাধারণ জ্ঞান"],
+  "দ্বিতীয়": ["বাংলা", "প্রিয় নবী", "গণিত", "আরবি", "ইংরেজি ১ম", "ইংরেজি ২য়", "ওয়ার্ডবুক", "সাধারণ জ্ঞান", "কম্পিউটার", "কোরআন"],
+  "তৃতীয়": ["বাংলা", "এসো জীবন গড়ি", "কোরআন", "ইংরেজি ১ম", "ইংরেজি ২য়", "হাদিস", "বিজ্ঞান", "বাংলাদেশ ও বিশ্বপরিচয়", "গণিত", "আরবি", "সাধারণ জ্ঞান", "কম্পিউটার"],
+  "চতুর্থ": ["ইংরেজি ১ম", "ইংরেজি ২য়", "বিজ্ঞান", "বাংলাদেশ ও বিশ্বপরিচয়", "বাংলা", "এসো জীবন গড়ি", "কোরআন ও আকাইদ", "আরবি ১ম", "আরবি ২য়", "তালিমুল মুতাল্লিম", "কোরআন", "গণিত", "সাধারণ জ্ঞান", "কম্পিউটার"],
+  "পঞ্চম": ["আরবি ১ম", "আরবি ২য়", "সিরাজুল জুই ইসলাম", "ইংরেজি", "বাংলা ১ম", "বাংলা ২য়", "বিজ্ঞান", "বাংলাদেশ ও বিশ্বপরিচয়", "গণিত", "কোরআন"],
+  "ষষ্ঠ": ["আরবি ১ম", "কোরআন ও আকাইদ", "কৃষি", "তথ্য প্রযুক্তি", "ইংরেজি ১ম", "ইংরেজি ২য়", "বাংলা ১ম", "বাংলা ২য়", "বিজ্ঞান", "বাংলাদেশ ও বিশ্বপরিচয়", "আরবি ২য়", "গণিত"]
+};
+
+document.getElementById('date').valueAsDate = new Date();
+
+function bn(num){
+  const map = {'0':'০','1':'১','2':'২','3':'৩','4':'৪','5':'৫','6':'৬','7':'৭','8':'৮','9':'৯'};
+  return num.toString().replace(/[0-9]/g, d => map[d]);
+}
+
+function loadSubjects(){
+  const cls = document.getElementById('cls').value;
+  const box = document.getElementById('subjectsBox');
+  const field = document.getElementById('subjectsField');
+  box.innerHTML = '';
+  if (!cls || !classSubjects[cls]) { field.style.display = 'none'; return; }
+  field.style.display = 'block';
+
+  classSubjects[cls].forEach(sub => {
+    const row = document.createElement('div');
+    row.className = 'subject-row';
+    const lbl = document.createElement('label');
+    lbl.innerText = sub;
+    const inp = document.createElement('input');
+    inp.type = 'text';
+    inp.className = 'subject-input';
+    inp.placeholder = 'যেমন: ১-৫ পৃষ্ঠা';
+    inp.dataset.subject = sub;
+    row.appendChild(lbl);
+    row.appendChild(inp);
+    box.appendChild(row);
+  });
+}
+
+function sizeCard(){
+  const viewport = document.getElementById('cardViewport');
+  const card = document.getElementById('card');
+  const w = Math.round(viewport.getBoundingClientRect().width);
+  viewport.style.height = w + 'px';
+  card.style.width = w + 'px';
+  card.style.height = w + 'px';
+}
+
+window.addEventListener('resize', () => {
+  if (document.getElementById('previewPage').style.display === 'block') {
+    sizeCard();
+    fitToSquare();
+  }
+});
+
+function showPreview(){
+  const cls = document.getElementById('cls').value;
+  if (!cls) { alert("শ্রেণি নির্বাচন করুন"); return; }
+
+  const dateVal = document.getElementById('date').value;
+  document.getElementById('editClass').innerText = "শ্রেণি: " + cls;
+  const parts = dateVal.split("-");
+  document.getElementById('editDate').innerText = bn(parts[2]) + "-" + bn(parts[1]) + "-" + bn(parts[0]);
+
+  const table = document.getElementById('previewTable');
+  table.innerHTML = '';
+  document.querySelectorAll('.subject-input').forEach(inp => {
+    const sub = inp.dataset.subject;
+    const val = inp.value || '—';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td class="subject-cell">${sub}:</td><td class="lesson-cell" contenteditable="true">${val}</td>`;
+    table.appendChild(tr);
+  });
+
+  document.getElementById('formPage').style.display = 'none';
+  document.getElementById('previewPage').style.display = 'block';
+  window.scrollTo(0, 0);
+  sizeCard();
+  requestAnimationFrame(() => requestAnimationFrame(fitToSquare));
+}
+
+function fitToSquare(){
+  const wrap = document.getElementById('tableWrap');
+  const cardPx = parseInt(document.getElementById('card').style.width) || 400;
+
+  let font = Math.round(cardPx * 0.038);
+  let padV = Math.round(cardPx * 0.010);
+
+  function apply(){
+    wrap.querySelectorAll('td').forEach(td => {
+      td.style.fontSize = font + 'px';
+      td.style.padding = padV + 'px 6px';
+    });
+  }
+  apply();
+
+  let guard = 0;
+  while (wrap.scrollHeight > wrap.clientHeight && font > cardPx * 0.018 && guard < 60){
+    font -= 1;
+    padV = Math.max(1, padV - 0.4);
+    apply();
+    guard++;
+  }
+}
+
+function backToForm(){
+  document.getElementById('previewPage').style.display = 'none';
+  document.getElementById('formPage').style.display = 'block';
+  window.scrollTo(0, 0);
+}
+
+/* ===== উচ্চ রেজোলিউশনের ছবি তৈরি ===== */
+async function generateCanvas(){
+  const card = document.getElementById('card');
+  const bar = document.querySelector('.action-bar');
+  const backBtn = document.getElementById('backBtn');
+  const hint = document.querySelector('.hint');
+  const editables = document.querySelectorAll('[contenteditable]');
+
+  bar.style.display = 'none'; backBtn.style.display = 'none'; hint.style.display = 'none';
+  editables.forEach(el => el.style.background = 'transparent');
+
+  try {
+    if (typeof html2canvas === 'undefined') {
+      await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
+    }
+    if (document.fonts && document.fonts.ready) { await document.fonts.ready; }
+
+    const size = parseInt(card.style.width) || Math.round(card.getBoundingClientRect().width);
+
+    const TARGET = 1440;
+    const scale = Math.max(4, TARGET / size);
+
+    const canvas = await html2canvas(card, {
+      scale: scale,
+      backgroundColor: '#ffffff',
+      useCORS: true,
+      logging: false,
+      width: size,
+      height: size,
+      windowWidth: size,
+      windowHeight: size,
+      imageTimeout: 0
+    });
+    bar.style.display = 'flex'; backBtn.style.display = 'flex'; hint.style.display = 'flex';
+    return canvas;
+  } catch (err) {
+    bar.style.display = 'flex'; backBtn.style.display = 'flex'; hint.style.display = 'flex';
+    alert("ছবি তৈরি করতে সমস্যা হয়েছে: " + err.message);
+    return null;
+  }
+}
+
+async function downloadImage(){
+  const canvas = await generateCanvas();
+  if (!canvas) return;
+  const link = document.createElement('a');
+  link.download = 'syllabus.png';
+  link.href = canvas.toDataURL('image/png', 1.0);
+  link.click();
+}
+
+async function shareImage(){
+  const canvas = await generateCanvas();
+  if (!canvas) return;
+  canvas.toBlob(async (blob) => {
+    const file = new File([blob], "syllabus.png", { type: "image/png" });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try { await navigator.share({ files: [file], title: 'দৈনিক পাঠ্যসূচি', text: 'আজকের পাঠ্যসূচি' }); } catch(e){}
+    } else {
+      const link = document.createElement('a');
+      link.download = 'syllabus.png';
+      link.href = URL.createObjectURL(file);
+      link.click();
+      alert("আপনার ব্রাউজার সরাসরি শেয়ার সাপোর্ট করে না। ছবি ডাউনলোড হয়ে গেছে।");
+    }
+  }, "image/png", 1.0);
+}
+
+function loadScript(src){
+  return new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = src; s.onload = resolve; s.onerror = reject;
+    document.head.appendChild(s);
+  });
+}
+</script>
+
+</body>
+</html>
