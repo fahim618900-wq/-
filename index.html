@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>দৈনিক পাঠ্যসূচি</title>
 <link href="https://fonts.maateen.me/kalpurush/font.css" rel="stylesheet">
-  <style>
+<style>
 :root{
   --blue:#2563eb;
   --blue-dark:#1d4ed8;
@@ -20,34 +20,38 @@
   --shadow:0 4px 14px rgba(15,23,42,.08);
   --shadow-sm:0 2px 8px rgba(15,23,42,.06);
 }
-*{ box-sizing:border-box; font-family:'Tiro Bangla','Hind Siliguri',serif; }
+*{
+  box-sizing:border-box;
+  font-family:'Kalpurush', sans-serif;
+  font-weight:normal;
+}
 html,body{ background:var(--paper); }
 body{ margin:0; padding:18px; color:var(--ink); min-height:100%; }
 svg.icon{ width:18px; height:18px; flex-shrink:0; }
 
 /* ===== ফর্ম পেজ ===== */
-.box{ max-width:480px; margin:auto; font-family:'Hind Siliguri',sans-serif; }
-.eyebrow{ font-weight:600; font-size:13px; color:var(--blue); margin:0 0 4px 2px; letter-spacing:.3px; }
-h2{ font-size:25px; font-weight:700; margin:0 0 18px 2px; color:var(--ink); }
+.box{ max-width:480px; margin:auto; }
+.eyebrow{ font-weight:normal; font-size:15px; color:var(--blue); margin:0 0 4px 2px; letter-spacing:.3px; }
+h2{ font-size:26px; font-weight:normal; margin:0 0 18px 2px; color:var(--ink); }
 
 .field{ background:var(--white); border:var(--line) solid #e2e8f0; border-radius:var(--radius);
   box-shadow:var(--shadow-sm); padding:12px 14px; margin-bottom:14px; }
-label{ font-weight:600; font-size:13px; display:block; margin-bottom:6px; color:var(--ink); }
+label{ font-weight:normal; font-size:15px; display:block; margin-bottom:6px; color:var(--ink); }
 select,input[type=date]{ width:100%; padding:9px 6px; border:none; border-bottom:1.5px solid #e2e8f0;
-  background:transparent; font-size:16px; font-weight:600; color:var(--ink);
-  font-family:'Hind Siliguri',sans-serif; transition:border-color .2s; }
+  background:transparent; font-size:17px; font-weight:normal; color:var(--ink);
+  transition:border-color .2s; }
 select:focus,input:focus{ outline:none; border-color:var(--blue); }
 
 .subject-row{ display:flex; align-items:center; gap:10px; margin-top:10px; }
-.subject-row label{ width:38%; margin:0; font-size:13px; font-weight:600; }
+.subject-row label{ width:38%; margin:0; font-size:15px; font-weight:normal; }
 .subject-input{ flex:1; padding:8px 6px; border:none; border-bottom:1.5px solid #e2e8f0; background:transparent;
-  font-size:14px; color:var(--ink); font-family:'Hind Siliguri',sans-serif; transition:border-color .2s; }
+  font-size:16px; color:var(--ink); transition:border-color .2s; }
 .subject-input:focus{ outline:none; border-color:var(--blue); }
 
 #genBtn{ width:100%; padding:15px; border:none; border-radius:12px;
-  background:var(--blue); color:#fff; font-size:16px; font-weight:700; cursor:pointer; margin-top:6px;
+  background:var(--blue); color:#fff; font-size:17px; font-weight:normal; cursor:pointer; margin-top:6px;
   box-shadow:0 4px 12px rgba(37,99,235,.25); display:flex; align-items:center; justify-content:center; gap:8px;
-  font-family:'Hind Siliguri',sans-serif; transition:background .2s, transform .1s; }
+  transition:background .2s, transform .1s; }
 #genBtn:hover{ background:var(--blue-dark); }
 #genBtn:active{ transform:scale(.99); }
 
@@ -65,18 +69,18 @@ select:focus,input:focus{ outline:none; border-color:var(--blue); }
   text-align:center;
   flex:0 0 auto;
 }
-.title{ font-size:19px; font-weight:700; color:var(--ink); margin-bottom:4px; line-height:1.2; }
+.title{ font-size:20px; font-weight:normal; color:var(--ink); margin-bottom:4px; line-height:1.2; }
 .class-banner{
   display:inline-block; background:var(--white); color:var(--blue);
-  padding:3px 14px; border-radius:20px; font-size:14px; font-weight:600;
+  padding:3px 14px; border-radius:20px; font-size:15px; font-weight:normal;
   border:1px solid #c7d2fe;
 }
 
 .date-row{ flex:0 0 auto; display:flex; justify-content:space-between; align-items:center;
   background:var(--white); padding:7px 16px; border-bottom:1px solid #eef2f7;
-  font-size:12px; font-family:'Hind Siliguri',sans-serif; color:var(--ink); }
-.date-row .label{ display:flex; align-items:center; gap:6px; font-weight:600; color:var(--blue); }
-.date-row .value{ font-weight:600; }
+  font-size:14px; color:var(--ink); }
+.date-row .label{ display:flex; align-items:center; gap:6px; font-weight:normal; color:var(--blue); }
+.date-row .value{ font-weight:normal; }
 
 .content-area{ flex:1 1 auto; padding:8px 14px; overflow:hidden; min-height:0; display:flex; }
 #tableWrap{ width:100%; overflow:hidden; align-self:stretch; }
@@ -84,8 +88,8 @@ select:focus,input:focus{ outline:none; border-color:var(--blue); }
 .routine-table tr{ border-bottom:1px solid #eef2f7; }
 .routine-table tr:last-child{ border-bottom:none; }
 .routine-table td{ padding:4px 6px; vertical-align:top; line-height:1.35; word-break:break-word;
-  font-family:'Hind Siliguri',sans-serif; color:var(--ink); }
-.subject-cell{ width:36%; font-weight:700; color:var(--blue); }
+  color:var(--ink); }
+.subject-cell{ width:36%; font-weight:normal; color:var(--blue); }
 .lesson-cell{ width:64%; color:var(--ink); }
 
 .footer{
@@ -93,23 +97,22 @@ select:focus,input:focus{ outline:none; border-color:var(--blue); }
   border-top:1px solid #e2e8f0;
   padding:9px 14px;
   text-align:center;
-  font-family:'Hind Siliguri',sans-serif;
   flex:0 0 auto;
 }
-.footer .institution{ font-size:13px; font-weight:700; color:var(--ink); margin-bottom:3px; }
-.footer .contact-line{ font-size:10px; color:var(--muted); line-height:1.5; }
+.footer .institution{ font-size:14px; font-weight:normal; color:var(--ink); margin-bottom:3px; }
+.footer .contact-line{ font-size:11px; color:var(--muted); line-height:1.5; }
 .footer .contact-line span{ margin:0 3px; }
 
 [contenteditable="true"]{ outline:none; border-radius:4px; padding:1px 3px; cursor:text; transition:background .15s; }
 [contenteditable="true"]:focus{ background:rgba(37,99,235,.10); box-shadow:0 0 0 2px rgba(37,99,235,.35); }
 
-.hint{ display:flex; align-items:center; justify-content:center; gap:6px; font-size:12px; color:var(--muted);
-  margin:10px 0 0; font-family:'Hind Siliguri',sans-serif; }
+.hint{ display:flex; align-items:center; justify-content:center; gap:6px; font-size:13px; color:var(--muted);
+  margin:10px 0 0; }
 
 .action-bar{ display:flex; gap:10px; margin-top:14px; }
 .action-bar button{ flex:1; padding:13px; border:none; border-radius:12px;
-  font-size:15px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center;
-  gap:7px; font-family:'Hind Siliguri',sans-serif; transition:background .2s, transform .1s, box-shadow .2s; }
+  font-size:16px; font-weight:normal; cursor:pointer; display:flex; align-items:center; justify-content:center;
+  gap:7px; transition:background .2s, transform .1s, box-shadow .2s; }
 .action-bar button:active{ transform:scale(.98); }
 #downloadBtn{ background:var(--blue); color:#fff; box-shadow:0 4px 12px rgba(37,99,235,.25); }
 #downloadBtn:hover{ background:var(--blue-dark); }
@@ -117,8 +120,8 @@ select:focus,input:focus{ outline:none; border-color:var(--blue); }
 #shareBtn:hover{ background:#f8fafc; }
 
 #backBtn{ width:100%; padding:11px; border:1px solid #e2e8f0; border-radius:12px; background:transparent;
-  color:var(--muted); font-size:14px; font-weight:600; cursor:pointer; margin-top:10px;
-  display:flex; align-items:center; justify-content:center; gap:6px; font-family:'Hind Siliguri',sans-serif;
+  color:var(--muted); font-size:15px; font-weight:normal; cursor:pointer; margin-top:10px;
+  display:flex; align-items:center; justify-content:center; gap:6px;
   transition:background .2s, color .2s; }
 #backBtn:hover{ background:#f8fafc; color:var(--ink); }
 </style>
@@ -336,6 +339,8 @@ async function generateCanvas(){
       await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
     }
     if (document.fonts && document.fonts.ready) { await document.fonts.ready; }
+    // ফন্ট রেন্ডার হওয়ার জন্য অতিরিক্ত অপেক্ষা
+    await new Promise(r => setTimeout(r, 400));
 
     const size = parseInt(card.style.width) || Math.round(card.getBoundingClientRect().width);
 
