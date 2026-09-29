@@ -96,8 +96,8 @@ select:focus,input:focus{ outline:none; border-color:var(--blue); }
 .date-row .label svg{ width:0.9em; height:0.9em; }
 
 .content{ flex:1 1 auto; padding:1.2% 2.4%; overflow:hidden; display:flex; min-height:0; }
-#tableWrap{ width:100%; height:100%; overflow:hidden; }
-.routine-table{ width:100%; border-collapse:collapse; table-layout:fixed; }
+#tableWrap{ width:100%; height:100%; overflow:hidden; position:relative; }
+.routine-table{ width:100%; border-collapse:collapse; table-layout:fixed; transform-origin:top left; }
 .routine-table tr{ border-bottom:1px solid #eef2f7; }
 .routine-table tr:last-child{ border-bottom:none; }
 .routine-table td{ padding:0.3% 1%; vertical-align:middle; line-height:1.25; word-break:break-word;
@@ -296,21 +296,38 @@ function showPreview(){
   requestAnimationFrame(() => requestAnimationFrame(fitToSquare));
 }
 
-/* ==================== ১:১ কার্ডে অটো-ফিট ==================== */
+/* =========================================================
+   ১:১ কার্ডে অটো-ফিট
+   ---------------------------------------------------------
+   ✅ বিষয় বেশি হলে → ছোট হবে
+   ✅ পাঠ্য/লেখা বড় হলে → সেটাও ছোট হবে
+   ✅ কনটেন্ট কখনো কার্ডের বাইরে যাবে না
+   ========================================================= */
 function fitToSquare(){
-  const card = document.getElementById('card');
-  const wrap = document.getElementById('tableWrap');
+  const card  = document.getElementById('card');
+  const wrap  = document.getElementById('tableWrap');
   const table = document.getElementById('previewTable');
-  const rows = table.querySelectorAll('tr');
+  const rows  = table.querySelectorAll('tr');
   if (!rows.length) return;
+
+  /* আগের সেটিংস রিসেট (resize বা বারবার কলের জন্য) */
+  table.style.transform = '';
+  table.style.transformOrigin = '';
+  table.style.width = '100%';
+  rows.forEach(tr => tr.querySelectorAll('td').forEach(td => {
+    td.style.fontSize = '';
+    td.style.paddingTop = '';
+    td.style.paddingBottom = '';
+    td.style.lineHeight = '';
+  }));
 
   const cardPx = card.clientWidth;
   const wrapH  = wrap.clientHeight;
+  const wrapW  = wrap.clientWidth;
 
-  /* ⚠️ আগে ছিল ১২px — এখন আরও নিচে নামানো হয়েছে
-     যাতে ১৪-২০ বিষয়ও বর্গাকার কার্ডে ফিট হয় */
-  const minFont = Math.max(8, Math.round(cardPx * 0.022));  // কার্ডের ২.২% (সর্বনিম্ন ৮px)
-  const maxFont = Math.round(cardPx * 0.05);                // কার্ডের ৫% (সর্বোচ্চ)
+  /* ফন্ট সীমা — পাঠ্য অনেক বড় হলেও যাতে ফিট হয় তাই minFont আরেকটু কম */
+  const minFont = Math.max(6, Math.round(cardPx * 0.014));  // কার্ডের ~১.৪% (সর্বনিম্ন ৬px)
+  const maxFont = Math.round(cardPx * 0.05);                // কার্ডের ~৫% (সর্বোচ্চ)
 
   let font = maxFont;
   let padV = Math.max(0, Math.round(cardPx * 0.004));
@@ -321,39 +338,75 @@ function fitToSquare(){
         td.style.fontSize = font + 'px';
         td.style.paddingTop = padV + 'px';
         td.style.paddingBottom = padV + 'px';
+        td.style.lineHeight = '1.25';
       });
     });
   }
   apply();
 
-  /* ধাপ ১: কনটেন্ট বেশি হলে ফন্ট কমাতে থাকব (minFont পর্যন্ত) */
+  /* ─── ধাপ ১: কনটেন্ট বেশি হলে ফন্ট কমাতে থাকব (minFont পর্যন্ত) ─── */
   let guard = 0;
-  while (table.scrollHeight > wrapH && font > minFont && guard < 200){
+  while (table.scrollHeight > wrapH && font > minFont && guard < 400){
     font -= 1;
     padV = Math.max(0, padV - 0.3);
     apply();
     guard++;
   }
 
-  /* ধাপ ২: এখনো ফিট না হলে ইনপুটের প্যাডিং শূন্য করব */
+  /* ─── ধাপ ২: এখনো ফিট না হলে প্যাডিং ০ করব + লাইন-হাইট কমাব ─── */
   if (table.scrollHeight > wrapH) {
     rows.forEach(tr => {
       tr.querySelectorAll('td').forEach(td => {
         td.style.paddingTop = '0px';
         td.style.paddingBottom = '0px';
-        td.style.lineHeight = '1.1';
+        td.style.lineHeight = '1.05';
       });
     });
   }
 
-  /* ধাপ ৩: কনটেন্ট কম হলে ফন্ট বাড়াতে থাকব (maxFont পর্যন্ত) */
-  guard = 0;
-  while (table.scrollHeight < wrapH * 0.86 &&
-         font < maxFont && guard < 100){
-    font += 1;
-    padV = Math.min(cardPx * 0.012, padV + 0.3);
-    apply();
-    guard++;
+  /* ─── ধাপ ৩: এখনো ফিট না হলে → পুরো টেবিলই scale করে ছোট করব ───
+     (এখানেই মূল কাজ — পাঠ্য অনেক বড় হয়ে গেলেও কনটেন্ট বর্ডার/ফুটারের বাইরে যাবে না) */
+  if (table.scrollHeight > wrapH) {
+    let scale = wrapH / table.scrollHeight;
+
+    /* কয়েকবার ইটারেট করছি যাতে width কমপেনসেশনের পরেও হাইট ঠিক থাকে */
+    for (let i = 0; i < 6; i++){
+      table.style.transformOrigin = 'top left';
+      table.style.transform = 'scale(' + scale + ')';
+      table.style.width = (100 / scale) + '%';
+
+      /* width বদলানোর পর টেক্সট reflow হবে — নতুন উচ্চতা মাপি */
+      const newH = table.scrollHeight;
+      const visualH = newH * scale;
+      if (visualH <= wrapH) break;
+
+      /* আরেকটু ছোট করি */
+      const adjust = wrapH / visualH;
+      scale = scale * adjust;
+    }
+
+    /* ফাইনাল অ্যাপ্লাই (নিশ্চিতভাবে ফিট) */
+    table.style.transformOrigin = 'top left';
+    table.style.transform = 'scale(' + scale + ')';
+    table.style.width = (100 / scale) + '%';
+  }
+  /* ─── ধাপ ৪: কনটেন্ট কম হলে ফন্ট বাড়াতে থাকব (maxFont পর্যন্ত) ─── */
+  else {
+    guard = 0;
+    while (table.scrollHeight < wrapH * 0.86 &&
+           font < maxFont && guard < 120){
+      font += 1;
+      padV = Math.min(cardPx * 0.012, padV + 0.3);
+      apply();
+      guard++;
+    }
+    /* বাড়ানোর পর যদি একটু overflow হয়, ছোট scale দিয়ে ঠিক করি */
+    if (table.scrollHeight > wrapH) {
+      const scale = wrapH / table.scrollHeight;
+      table.style.transformOrigin = 'top left';
+      table.style.transform = 'scale(' + scale + ')';
+      table.style.width = (100 / scale) + '%';
+    }
   }
 }
 
@@ -377,6 +430,9 @@ async function generateCanvas(){
   const backBtn = document.getElementById('backBtn');
   const hint = document.querySelector('.hint');
   const editables = document.querySelectorAll('[contenteditable]');
+
+  /* ফিটিং নিশ্চিত করি ছবি তোলার ঠিক আগে */
+  fitToSquare();
 
   bar.style.display = 'none';
   backBtn.style.display = 'none';
