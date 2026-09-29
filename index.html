@@ -46,6 +46,7 @@ select:focus,input:focus{ outline:none; border-color:var(--blue); }
 .subject-input{ flex:1; padding:8px 6px; border:none; border-bottom:1.5px solid #e2e8f0; background:transparent;
   font-size:16px; color:var(--ink); transition:border-color .2s; }
 .subject-input:focus{ outline:none; border-color:var(--blue); }
+.subject-input::placeholder{ color:#cbd5e1; font-size:14px; }
 
 #genBtn{ width:100%; padding:15px; border:none; border-radius:12px;
   background:var(--blue); color:#fff; font-size:17px; cursor:pointer; margin-top:6px;
@@ -60,7 +61,6 @@ select:focus,input:focus{ outline:none; border-color:var(--blue); }
 
 .routine-card{
   width:100%;
-  aspect-ratio:1 / 1;
   background:var(--white);
   border:1px solid #e2e8f0;
   border-radius:var(--radius);
@@ -68,11 +68,6 @@ select:focus,input:focus{ outline:none; border-color:var(--blue); }
   overflow:hidden;
   display:flex;
   flex-direction:column;
-}
-
-@supports not (aspect-ratio: 1 / 1){
-  .routine-card{ position:relative; }
-  .routine-card::before{ content:""; display:block; padding-top:100%; }
 }
 
 .header{
@@ -137,11 +132,48 @@ select:focus,input:focus{ outline:none; border-color:var(--blue); }
   display:flex; align-items:center; justify-content:center; gap:6px;
   transition:background .2s, color .2s; }
 #backBtn:hover{ background:#f8fafc; color:var(--ink); }
+
+#doneBtn{
+  display:none;
+  position:fixed;
+  bottom:24px;
+  right:24px;
+  padding:13px 26px;
+  background:var(--blue);
+  color:#fff;
+  border:none;
+  border-radius:28px;
+  font-size:16px;
+  font-family:'Kalpurush', sans-serif;
+  box-shadow:0 6px 18px rgba(37,99,235,.45);
+  z-index:9999;
+  cursor:pointer;
+  align-items:center;
+  gap:8px;
+  transition:background .2s, transform .1s;
+  animation:donePulse .3s ease;
+}
+#doneBtn.show{ display:flex; }
+#doneBtn:hover{ background:var(--blue-dark); }
+#doneBtn:active{ transform:scale(.96); }
+#doneBtn svg{ width:18px; height:18px; }
+
+@keyframes donePulse{
+  from { opacity:0; transform: translateY(20px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+
+#toast{
+  position:fixed; bottom:20px; left:50%; transform:translateX(-50%) translateY(100px);
+  background:var(--ink); color:#fff; padding:10px 18px; border-radius:24px;
+  font-size:14px; box-shadow:0 8px 20px rgba(0,0,0,.2); z-index:999;
+  transition:transform .3s ease; pointer-events:none;
+}
+#toast.show{ transform:translateX(-50%) translateY(0); }
 </style>
 </head>
 <body>
 
-<!-- ==================== ফর্ম পেজ ==================== -->
 <div class="box" id="formPage">
   <div class="eyebrow">নতুন এন্ট্রি</div>
   <h2>দৈনিক পাঠ্যসূচি</h2>
@@ -171,7 +203,6 @@ select:focus,input:focus{ outline:none; border-color:var(--blue); }
   </button>
 </div>
 
-<!-- ==================== প্রিভিউ পেজ ==================== -->
 <div id="previewPage">
   <div id="cardViewport">
     <div class="routine-card" id="card">
@@ -223,8 +254,15 @@ select:focus,input:focus{ outline:none; border-color:var(--blue); }
   </button>
 </div>
 
+<button id="doneBtn" type="button">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+  সম্পন্ন
+</button>
+
+<div id="toast"></div>
+
 <script>
-/* ==================== শ্রেণিভিত্তিক বিষয় তালিকা ==================== */
+/* ==================== শ্রেণিভিত্তিক বিষয় ==================== */
 const classSubjects = {
   "প্লে": ["কোরআন", "আরবি", "ইংরেজি", "গণিত", "ড্রইং", "বাংলা", "সাধারণ জ্ঞান"],
   "নার্সারি": ["গণিত", "ড্রইং", "বাংলা", "সাধারণ জ্ঞান", "কোরআন", "ইংরেজি"],
@@ -238,12 +276,79 @@ const classSubjects = {
 
 document.getElementById('date').valueAsDate = new Date();
 
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.innerText = msg;
+  t.classList.add('show');
+  clearTimeout(t._time);
+  t._time = setTimeout(() => t.classList.remove('show'), 2000);
+}
+
 function bn(num){
   const map = {'0':'০','1':'১','2':'২','3':'৩','4':'৪','5':'৫','6':'৬','7':'৭','8':'৮','9':'৯'};
   return num.toString().replace(/[0-9]/g, d => map[d]);
 }
 
-/* ==================== বিষয় ইনপুট তৈরি ==================== */
+/* =========================================================
+   কার্ডকে SQUARE করা
+   ========================================================= */
+function sizeCardSquare(){
+  const card = document.getElementById('card');
+  if (!card) return;
+  card.style.height = 'auto';
+  const w = card.offsetWidth;
+  if (w > 0){
+    card.style.height = w + 'px';
+  }
+}
+
+/* =========================================================
+   কীবোর্ড ক্লোজ
+   ========================================================= */
+const doneBtn = document.getElementById('doneBtn');
+
+document.addEventListener('focusin', (e) => {
+  if (e.target.isContentEditable){
+    doneBtn.classList.add('show');
+  }
+});
+
+document.addEventListener('focusout', () => {
+  setTimeout(() => {
+    if (!document.activeElement || !document.activeElement.isContentEditable){
+      doneBtn.classList.remove('show');
+    }
+  }, 100);
+});
+
+doneBtn.addEventListener('click', (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  if (document.activeElement && document.activeElement.isContentEditable){
+    document.activeElement.blur();
+  }
+  doneBtn.classList.remove('show');
+});
+
+document.addEventListener('pointerdown', (e) => {
+  const active = document.activeElement;
+  if (!active || !active.isContentEditable) return;
+  if (active === e.target) return;
+  if (active.contains(e.target)) return;
+  if (e.target.isContentEditable) return;
+  if (e.target === doneBtn || doneBtn.contains(e.target)) return;
+  active.blur();
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape'){
+    if (document.activeElement && document.activeElement.isContentEditable){
+      document.activeElement.blur();
+    }
+  }
+});
+
+/* ==================== বিষয় ইনপুট ==================== */
 function loadSubjects(){
   const cls = document.getElementById('cls').value;
   const box = document.getElementById('subjectsBox');
@@ -252,23 +357,44 @@ function loadSubjects(){
   if (!cls || !classSubjects[cls]) { field.style.display = 'none'; return; }
   field.style.display = 'block';
 
-  classSubjects[cls].forEach(sub => {
+  const subjects = classSubjects[cls];
+  subjects.forEach((sub, index) => {
     const row = document.createElement('div');
     row.className = 'subject-row';
+
     const lbl = document.createElement('label');
     lbl.innerText = sub;
+
     const inp = document.createElement('input');
     inp.type = 'text';
     inp.className = 'subject-input';
     inp.placeholder = 'যেমন: ১-৫ পৃষ্ঠা';
     inp.dataset.subject = sub;
+    inp.autocomplete = 'off';
+
+    inp.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter'){
+        e.preventDefault();
+        const next = document.querySelectorAll('.subject-input')[index + 1];
+        if (next) next.focus();
+        else showPreview();
+      }
+    });
+
     row.appendChild(lbl);
     row.appendChild(inp);
     box.appendChild(row);
   });
+
+  setTimeout(() => {
+    const first = document.querySelector('.subject-input');
+    if (first) first.focus();
+  }, 80);
 }
 
-/* ==================== প্রিভিউ ==================== */
+/* =========================================================
+   প্রিভিউ
+   ========================================================= */
 function showPreview(){
   const cls = document.getElementById('cls').value;
   if (!cls) { alert("শ্রেণি নির্বাচন করুন"); return; }
@@ -292,16 +418,17 @@ function showPreview(){
   document.getElementById('previewPage').style.display = 'block';
   window.scrollTo(0, 0);
 
-  /* দুই রাফ এর পর ফিট কল */
-  requestAnimationFrame(() => requestAnimationFrame(fitToSquare));
+  requestAnimationFrame(() => {
+    sizeCardSquare();
+    requestAnimationFrame(() => {
+      sizeCardSquare();
+      fitToSquare();
+    });
+  });
 }
 
 /* =========================================================
-   ১:১ কার্ডে অটো-ফিট
-   ---------------------------------------------------------
-   ✅ বিষয় বেশি হলে → ছোট হবে
-   ✅ পাঠ্য/লেখা বড় হলে → সেটাও ছোট হবে
-   ✅ কনটেন্ট কখনো কার্ডের বাইরে যাবে না
+   ১:১ কার্ডে অটো-ফিট + ভার্টিক্যাল সেন্টার
    ========================================================= */
 function fitToSquare(){
   const card  = document.getElementById('card');
@@ -310,10 +437,10 @@ function fitToSquare(){
   const rows  = table.querySelectorAll('tr');
   if (!rows.length) return;
 
-  /* আগের সেটিংস রিসেট (resize বা বারবার কলের জন্য) */
   table.style.transform = '';
   table.style.transformOrigin = '';
   table.style.width = '100%';
+  table.style.marginTop = '0px';
   rows.forEach(tr => tr.querySelectorAll('td').forEach(td => {
     td.style.fontSize = '';
     td.style.paddingTop = '';
@@ -323,11 +450,9 @@ function fitToSquare(){
 
   const cardPx = card.clientWidth;
   const wrapH  = wrap.clientHeight;
-  const wrapW  = wrap.clientWidth;
 
-  /* ফন্ট সীমা — পাঠ্য অনেক বড় হলেও যাতে ফিট হয় তাই minFont আরেকটু কম */
-  const minFont = Math.max(6, Math.round(cardPx * 0.014));  // কার্ডের ~১.৪% (সর্বনিম্ন ৬px)
-  const maxFont = Math.round(cardPx * 0.05);                // কার্ডের ~৫% (সর্বোচ্চ)
+  const minFont = Math.max(6, Math.round(cardPx * 0.014));
+  const maxFont = Math.round(cardPx * 0.05);
 
   let font = maxFont;
   let padV = Math.max(0, Math.round(cardPx * 0.004));
@@ -344,7 +469,6 @@ function fitToSquare(){
   }
   apply();
 
-  /* ─── ধাপ ১: কনটেন্ট বেশি হলে ফন্ট কমাতে থাকব (minFont পর্যন্ত) ─── */
   let guard = 0;
   while (table.scrollHeight > wrapH && font > minFont && guard < 400){
     font -= 1;
@@ -353,77 +477,132 @@ function fitToSquare(){
     guard++;
   }
 
-  /* ─── ধাপ ২: এখনো ফিট না হলে প্যাডিং ০ করব + লাইন-হাইট কমাব ─── */
-  if (table.scrollHeight > wrapH) {
-    rows.forEach(tr => {
-      tr.querySelectorAll('td').forEach(td => {
-        td.style.paddingTop = '0px';
-        td.style.paddingBottom = '0px';
-        td.style.lineHeight = '1.05';
-      });
-    });
+  if (table.scrollHeight > wrapH){
+    rows.forEach(tr => tr.querySelectorAll('td').forEach(td => {
+      td.style.paddingTop = '0px';
+      td.style.paddingBottom = '0px';
+      td.style.lineHeight = '1.05';
+    }));
   }
 
-  /* ─── ধাপ ৩: এখনো ফিট না হলে → পুরো টেবিলই scale করে ছোট করব ───
-     (এখানেই মূল কাজ — পাঠ্য অনেক বড় হয়ে গেলেও কনটেন্ট বর্ডার/ফুটারের বাইরে যাবে না) */
-  if (table.scrollHeight > wrapH) {
-    let scale = wrapH / table.scrollHeight;
+  let currentScale = 1;
 
-    /* কয়েকবার ইটারেট করছি যাতে width কমপেনসেশনের পরেও হাইট ঠিক থাকে */
+  if (table.scrollHeight > wrapH){
+    let scale = wrapH / table.scrollHeight;
     for (let i = 0; i < 6; i++){
       table.style.transformOrigin = 'top left';
       table.style.transform = 'scale(' + scale + ')';
       table.style.width = (100 / scale) + '%';
-
-      /* width বদলানোর পর টেক্সট reflow হবে — নতুন উচ্চতা মাপি */
-      const newH = table.scrollHeight;
-      const visualH = newH * scale;
+      const visualH = table.scrollHeight * scale;
       if (visualH <= wrapH) break;
-
-      /* আরেকটু ছোট করি */
-      const adjust = wrapH / visualH;
-      scale = scale * adjust;
+      scale = scale * (wrapH / visualH);
     }
-
-    /* ফাইনাল অ্যাপ্লাই (নিশ্চিতভাবে ফিট) */
     table.style.transformOrigin = 'top left';
     table.style.transform = 'scale(' + scale + ')';
     table.style.width = (100 / scale) + '%';
-  }
-  /* ─── ধাপ ৪: কনটেন্ট কম হলে ফন্ট বাড়াতে থাকব (maxFont পর্যন্ত) ─── */
-  else {
+    currentScale = scale;
+  } else {
     guard = 0;
-    while (table.scrollHeight < wrapH * 0.86 &&
-           font < maxFont && guard < 120){
+    while (table.scrollHeight < wrapH * 0.86 && font < maxFont && guard < 120){
       font += 1;
       padV = Math.min(cardPx * 0.012, padV + 0.3);
       apply();
       guard++;
     }
-    /* বাড়ানোর পর যদি একটু overflow হয়, ছোট scale দিয়ে ঠিক করি */
-    if (table.scrollHeight > wrapH) {
+    if (table.scrollHeight > wrapH){
       const scale = wrapH / table.scrollHeight;
       table.style.transformOrigin = 'top left';
       table.style.transform = 'scale(' + scale + ')';
       table.style.width = (100 / scale) + '%';
+      currentScale = scale;
     }
+  }
+
+  const visualH = table.scrollHeight * currentScale;
+  const leftover = wrapH - visualH;
+  if (leftover > 2){
+    table.style.marginTop = Math.round(leftover / 2) + 'px';
+  } else {
+    table.style.marginTop = '0px';
   }
 }
 
 window.addEventListener('resize', () => {
-  if (document.getElementById('previewPage').style.display === 'block') {
+  if (document.getElementById('previewPage').style.display === 'block'){
+    sizeCardSquare();
     fitToSquare();
   }
 });
 
-/* ==================== ফিরে যাওয়া ==================== */
 function backToForm(){
   document.getElementById('previewPage').style.display = 'none';
   document.getElementById('formPage').style.display = 'block';
   window.scrollTo(0, 0);
 }
 
-/* ==================== ছবি তৈরি (উচ্চ রেজোলিউশন) ==================== */
+/* =========================================================
+   scale "বেক"
+   ========================================================= */
+function bakeScaleForCapture(){
+  const table = document.getElementById('previewTable');
+  const rows = table.querySelectorAll('tr');
+  const m = (table.style.transform || '').match(/scale\(([\d.]+)\)/);
+  if (!m) return null;
+
+  const scale = parseFloat(m[1]);
+  if (scale >= 1) return null;
+
+  const orig = {
+    transform: table.style.transform,
+    transformOrigin: table.style.transformOrigin,
+    width: table.style.width,
+    marginTop: table.style.marginTop,
+    cells: []
+  };
+
+  table.style.transform = '';
+  table.style.transformOrigin = '';
+  table.style.width = '100%';
+  table.style.marginTop = '0px';
+
+  rows.forEach(tr => {
+    tr.querySelectorAll('td').forEach(td => {
+      const cs = getComputedStyle(td);
+      const fs = parseFloat(cs.fontSize);
+      const pt = parseFloat(cs.paddingTop);
+      const pb = parseFloat(cs.paddingBottom);
+      orig.cells.push({
+        td,
+        fontSize: td.style.fontSize,
+        paddingTop: td.style.paddingTop,
+        paddingBottom: td.style.paddingBottom
+      });
+      td.style.fontSize = (fs * scale) + 'px';
+      td.style.paddingTop = (pt * scale) + 'px';
+      td.style.paddingBottom = (pb * scale) + 'px';
+    });
+  });
+
+  return orig;
+}
+
+function restoreAfterCapture(orig){
+  if (!orig) return;
+  const table = document.getElementById('previewTable');
+  table.style.transform = orig.transform;
+  table.style.transformOrigin = orig.transformOrigin;
+  table.style.width = orig.width;
+  table.style.marginTop = orig.marginTop;
+  orig.cells.forEach(c => {
+    c.td.style.fontSize = c.fontSize;
+    c.td.style.paddingTop = c.paddingTop;
+    c.td.style.paddingBottom = c.paddingBottom;
+  });
+}
+
+/* =========================================================
+   ছবি তৈরি
+   ========================================================= */
 async function generateCanvas(){
   const card = document.getElementById('card');
   const bar = document.querySelector('.action-bar');
@@ -431,42 +610,74 @@ async function generateCanvas(){
   const hint = document.querySelector('.hint');
   const editables = document.querySelectorAll('[contenteditable]');
 
-  /* ফিটিং নিশ্চিত করি ছবি তোলার ঠিক আগে */
-  fitToSquare();
+  if (document.activeElement && document.activeElement.isContentEditable){
+    document.activeElement.blur();
+  }
+  doneBtn.classList.remove('show');
 
   bar.style.display = 'none';
   backBtn.style.display = 'none';
   hint.style.display = 'none';
   editables.forEach(el => el.style.background = 'transparent');
 
+  sizeCardSquare();
+  await new Promise(r => setTimeout(r, 80));
+  fitToSquare();
+  await new Promise(r => setTimeout(r, 80));
+
+  const baked = bakeScaleForCapture();
+  await new Promise(r => setTimeout(r, 120));
+
   try {
-    if (typeof html2canvas === 'undefined') {
+    if (typeof html2canvas === 'undefined'){
       await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
     }
-    if (document.fonts && document.fonts.ready) { await document.fonts.ready; }
-    await new Promise(r => setTimeout(r, 400));
 
-    const size = card.clientWidth || Math.round(card.getBoundingClientRect().width);
+    if (document.fonts){
+      try {
+        await document.fonts.load('16px Kalpurush');
+        await document.fonts.load('bold 16px Kalpurush');
+        await document.fonts.ready;
+      } catch(e){}
+    }
+    await new Promise(r => setTimeout(r, 300));
+
+    const w = card.offsetWidth;
+    const h = card.offsetHeight;
     const TARGET = 1440;
-    const scale = Math.max(4, TARGET / size);
+    const scale = Math.max(4, TARGET / w);
 
     const canvas = await html2canvas(card, {
       scale: scale,
       backgroundColor: '#ffffff',
       useCORS: true,
       logging: false,
-      width: size,
-      height: size,
-      windowWidth: size,
-      windowHeight: size,
-      imageTimeout: 0
+      width: w,
+      height: h,
+      windowWidth: w,
+      windowHeight: h,
+      scrollX: 0,
+      scrollY: 0,
+      onclone: (clonedDoc) => {
+        const clonedCard = clonedDoc.getElementById('card');
+        if (clonedCard){
+          clonedCard.style.width = w + 'px';
+          clonedCard.style.height = h + 'px';
+          clonedCard.style.aspectRatio = 'auto';
+          clonedCard.style.minHeight = h + 'px';
+          clonedCard.style.maxHeight = h + 'px';
+        }
+      }
     });
+
+    restoreAfterCapture(baked);
 
     bar.style.display = 'flex';
     backBtn.style.display = 'flex';
     hint.style.display = 'flex';
     return canvas;
-  } catch (err) {
+  } catch (err){
+    restoreAfterCapture(baked);
     bar.style.display = 'flex';
     backBtn.style.display = 'flex';
     hint.style.display = 'flex';
@@ -489,7 +700,7 @@ async function shareImage(){
   if (!canvas) return;
   canvas.toBlob(async (blob) => {
     const file = new File([blob], "syllabus.png", { type: "image/png" });
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    if (navigator.canShare && navigator.canShare({ files: [file] })){
       try { await navigator.share({ files: [file], title: 'দৈনিক পাঠ্যসূচি', text: ' ' }); } catch(e){}
     } else {
       const link = document.createElement('a');
