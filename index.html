@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>দৈনিক পাঠ্যসূচি</title>
+<title>Daily Agenda</title>
 <link rel="preconnect" href="https://fonts.maateen.me">
 <link href="https://fonts.maateen.me/kalpurush/font.css" rel="stylesheet">
 <style>
@@ -105,7 +105,7 @@ input:focus{outline:none;border-color:var(--b2);box-shadow:0 0 0 3px rgba(107,14
 .acts{display:flex;gap:10px}
 .acts .btn{margin:0}
 
-/* ===== কার্ড (১০৮০×১০৮০) ===== */
+/* ===== Card (1080×1080) ===== */
 #card{
   position:absolute;top:0;left:0;width:1080px;height:1080px;
   background:#fff;display:flex;flex-direction:column;
@@ -118,7 +118,7 @@ input:focus{outline:none;border-color:var(--b2);box-shadow:0 0 0 3px rgba(107,14
   --hdr-brd:rgba(0,0,0,.28);
 }
 
-/* 🌈 হেডার — স্ট্যাটিক মাল্টিকালার গ্রেডিয়েন্ট (ক্লাস অনুযায়ী) */
+/* Header — static multicolor gradient (per class) */
 .ch{
   height:132px;
   background:var(--hdr-grad);
@@ -157,7 +157,7 @@ input:focus{outline:none;border-color:var(--b2);box-shadow:0 0 0 3px rgba(107,14
 #tbl td{vertical-align:middle;line-height:1.3}
 #tbl td:first-child{width:38%;color:var(--b);font-weight:600;border-left:6px solid var(--b)}
 
-/* 🌈 ফুটার — স্ট্যাটিক মাল্টিকালার গ্রেডিয়েন্ট (ক্লাস অনুযায়ী উল্টো দিক) */
+/* Footer — static multicolor gradient (reverse) */
 .cf{
   height:86px;
   background:var(--ftr-grad);
@@ -193,32 +193,41 @@ input:focus{outline:none;border-color:var(--b2);box-shadow:0 0 0 3px rgba(107,14
 <div class="bg-fluid" aria-hidden="true"></div>
 
 <div id="s1">
-  <div class="top"><div><small>Darul Hikmah Model Madrasa </small><h1>Daily Agenda</h1></div></div>
-  <div class="wrap"><div class="sec"><h3>শ্রেণি বেছে নিন</h3><div class="chips" id="chips"></div></div></div>
+  <div class="top"><div><small>Darul Hikmah Model Madrasah</small><h1>Daily Agenda</h1></div></div>
+  <div class="wrap"><div class="sec"><h3>Select Class</h3><div class="chips" id="chips"></div></div></div>
 </div>
 
 <div id="s2">
-  <div class="top"><div><small>Darul Hikmah Model Madrasa </small><h1>দৈDaily Agenda</h1></div><button class="bk" onclick="toClass()">শ্রেণি বদলান</button></div>
+  <div class="top"><div><small>Darul Hikmah Model Madrasah</small><h1>Daily Agenda</h1></div><button class="bk" onclick="toClass()">Change Class</button></div>
   <div class="wrap">
     <div class="badge" id="badge"></div>
-    <div class="sec"><h3>তারিখ</h3><input type="date" id="date"></div>
-    <div class="sec"><h3>আজকের পড়া</h3><div id="subs"></div></div>
+    <div class="sec"><h3>Date</h3><input type="date" id="date"></div>
+    <div class="sec"><h3>Today's Lessons</h3><div id="subs"></div></div>
   </div>
-  <div class="bar"><button class="btn" onclick="preview()">প্রিভিউ দেখুন</button></div>
+  <div class="bar"><button class="btn" onclick="preview()">Preview</button></div>
 </div>
 
 <div id="prev">
-  <div class="top"><div><small>প্রিভিউ</small><h1>কার্ড প্রস্তুত</h1></div></div>
+  <div class="top"><div><small>Preview</small><h1>Card Ready</h1></div></div>
   <div class="wrap">
     <div class="stage" id="stage">
       <div id="card">
-          <div class="tl"><div class="ttl">Daily Agenda</div><div class="cls" id="eC" contenteditable="true"></div></div></div>
+        <div class="ch">
+          <div class="inst">Darul Hikmah Model Madrasah</div>
+          <div class="tl">
+            <div class="ttl">Daily Agenda</div>
+            <div class="cls" id="eC" contenteditable="true"></div>
+          </div>
+        </div>
         <div class="dt" id="eD" contenteditable="true"></div>
         <div id="body"><table id="tbl"></table></div>
-        <div class="cf"><b>Darul Hikmah Model Madrasah, Phulpur, Mymensingh.</b><span>+880 1970 517566 &nbsp;|&nbsp; dhmm.phulpur@gmail.com &nbsp;|&nbsp; Design: Abdullah fahim</span></div>
+        <div class="cf">
+          <b>Darul Hikmah Model Madrasah, Phulpur, Mymensingh.</b>
+          <span>+880 1970 517566 &nbsp;|&nbsp; dhmm.phulpur@gmail.com &nbsp;|&nbsp; Design: Abdullah Fahim</span>
+        </div>
       </div>
     </div>
-    <p class="hint">যেকোনো লেখায় ট্যাপ করে সরাসরি বদলান</p>
+    <p class="hint">Tap any text to edit it directly</p>
     <div class="acts"><button class="btn" onclick="save()">Download</button><button class="btn alt" onclick="share()">Share</button></div>
     <button class="btn alt" style="margin-top:10px" onclick="back()">Back</button>
   </div>
@@ -226,42 +235,39 @@ input:focus{outline:none;border-color:var(--b2);box-shadow:0 0 0 3px rgba(107,14
 <div id="toast"></div>
 
 <script>
-const S={"প্লে":["কোরআন","আরবি","ইংরেজি","গণিত","ড্রইং","বাংলা","সাধারণ জ্ঞান"],
-"নার্সারি":["গণিত","ড্রইং","বাংলা","সাধারণ জ্ঞান","কোরআন","ইংরেজি"],
-"প্রথম":["ইংরেজি","কোরআন","গণিত","কম্পিউটার","আরবি","বাংলা","সাধারণ জ্ঞান"],
-"দ্বিতীয়":["বাংলা","প্রিয় নবী","গণিত","আরবি","ইংরেজি ১ম","ইংরেজি ২য়","ওয়ার্ডবুক","সাধারণ জ্ঞান","কম্পিউটার","কোরআন"],
-"তৃতীয়":["বাংলা","এসো জীবন গড়ি","কোরআন","ইংরেজি ১ম","ইংরেজি ২য়","হাদিস","বিজ্ঞান","বাংলাদেশ ও বিশ্বপরিচয়","গণিত","আরবি","সাধারণ জ্ঞান","কম্পিউটার"],
-"চতুর্থ":["ইংরেজি ১ম","ইংরেজি ২য়","বিজ্ঞান","বাংলাদেশ ও বিশ্বপরিচয়","বাংলা","এসো জীবন গড়ি","কোরআন ও আকাইদ","আরবি ১ম","আরবি ২য়","তালিমুল কোরআন","কোরআন","গণিত","সাধারণ জ্ঞান","কম্পিউটার"],
-"পঞ্চম":["আরবি ১ম","আরবি ২য়","ইংরেজি","বাংলা ১ম","বাংলা ২য়","বিজ্ঞান","বাংলাদেশ ও বিশ্বপরিচয়","গণিত","কোরআন"],
-"ষষ্ঠ":["আরবি ১ম","কোরআন ও আকাইদ","কৃষি","তথ্য প্রযুক্তি","ইংরেজি ১ম","ইংরেজি ২য়","বাংলা ১ম","বাংলা ২য়","বিজ্ঞান","বাংলাদেশ ও বিশ্বপরিচয়","আরবি ২য়","গণিত"]};
-
-/* 🎨 প্রতিটি শ্রেণির জন্য আলাদা ৩টি রঙ
-   ফরম্যাট: [c1, c2, c3, textMode, badgeText]
-   textMode: "white" মানে সাদা টেক্সট, "dark" মানে কালো টেক্সট */
-
-/* 🎨 প্রতিটি শ্রেণির জন্য আলাদা ৩টি রঙ
-   ফরম্যাট: [c1, c2, c3, textMode, badgeText] */
-const THEME = {
-  "প্লে":     ["#F3B0C3","#FCE38A","#95E1D3","dark", "#C2185B"],  // 🌈 পেস্টেল রংধনু
-  "নার্সারি": ["#74EBD5","#9FA8DA","#ACB6E5","dark", "#5C6BC0"],
-  "প্রথম":    ["#6b0f87","#4d47ba","#0f6787","white","#4d47ba"],
-  "দ্বিতীয়":  ["#0A192F","#1E40AF","#00F2FE","white","#1E40AF"],
-  "তৃতীয়":   ["#E65C00","#F9D423","#FFF6E5","dark", "#E65C00"],
-  "চতুর্থ":   ["#4B0082","#8A2BE2","#E040FB","white","#8A2BE2"],
-  "পঞ্চম":    ["#004D40","#009688","#80CBC4","white","#00796B"],
-  "ষষ্ঠ":     ["#0F2027","#203A43","#2C5364","white","#203A43"]
+const S={
+  "Play":     ["Quran","Arabic","English","Math","Drawing","Bangla","General Knowledge"],
+  "Nursery":  ["Math","Drawing","Bangla","General Knowledge","Quran","English"],
+  "First":    ["English","Quran","Math","Computer","Arabic","Bangla","General Knowledge"],
+  "Second":   ["Bangla","Beloved Prophet","Math","Arabic","English 1st","English 2nd","Wordbook","General Knowledge","Computer","Quran"],
+  "Third":    ["Bangla","Esho Jibon Gori","Quran","English 1st","English 2nd","Hadith","Science","Bangladesh & Global Studies","Math","Arabic","General Knowledge","Computer"],
+  "Fourth":   ["English 1st","English 2nd","Science","Bangladesh & Global Studies","Bangla","Esho Jibon Gori","Quran & Aqaid","Arabic 1st","Arabic 2nd","Talimul Quran","Quran","Math","General Knowledge","Computer"],
+  "Fifth":    ["Arabic 1st","Arabic 2nd","English","Bangla 1st","Bangla 2nd","Science","Bangladesh & Global Studies","Math","Quran"],
+  "Sixth":    ["Arabic 1st","Quran & Aqaid","Agriculture","ICT","English 1st","English 2nd","Bangla 1st","Bangla 2nd","Science","Bangladesh & Global Studies","Arabic 2nd","Math"]
 };
 
-const M=["জানুয়ারি","ফেব্রুয়ারি","মার্চ","এপ্রিল","মে","জুন","জুলাই","আগস্ট","সেপ্টেম্বর","অক্টোবর","নভেম্বর","ডিসেম্বর"];
-const D=["রবিবার","সোমবার","মঙ্গলবার","বুধবার","বৃহস্পতিবার","শুক্রবার","শনিবার"];
+/* Per-class 3-color theme
+   Format: [c1, c2, c3, textMode, badgeText]
+   textMode: "white" = white text, "dark" = dark text */
+const THEME = {
+  "Play":     ["#F3B0C3","#FCE38A","#95E1D3","dark", "#C2185B"],   // 🌈 Pastel rainbow
+  "Nursery":  ["#74EBD5","#9FA8DA","#ACB6E5","dark", "#5C6BC0"],
+  "First":    ["#6b0f87","#4d47ba","#0f6787","white","#4d47ba"],
+  "Second":   ["#0A192F","#1E40AF","#00F2FE","white","#1E40AF"],
+  "Third":    ["#E65C00","#F9D423","#FFF6E5","dark", "#E65C00"],
+  "Fourth":   ["#4B0082","#8A2BE2","#E040FB","white","#8A2BE2"],
+  "Fifth":    ["#004D40","#009688","#80CBC4","white","#00796B"],
+  "Sixth":    ["#0F2027","#203A43","#2C5364","white","#203A43"]
+};
+
+const M=["January","February","March","April","May","June","July","August","September","October","November","December"];
+const D=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
 const $=id=>document.getElementById(id);
-const bn=n=>String(n).replace(/\d/g,d=>'০১২৩৪৫৬৭৮৯'[d]);
 const show=id=>{['s1','s2','prev'].forEach(x=>$(x).style.display=x===id?'block':'none');scrollTo(0,0)};
 let cls='',cache=null;
 function toast(m){const t=$('toast');t.textContent=m;t.classList.add('s');setTimeout(()=>t.classList.remove('s'),2000)}
 function today(){const n=new Date();return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0')}
 
-/* 🎨 ক্লাস অনুযায়ী কার্ডের থিম (হেডার + ফুটার) প্রয়োগ */
 function applyTheme(c){
   const t = THEME[c]; if(!t) return;
   const [c1,c2,c3,mode,badgeTxt] = t;
@@ -278,11 +284,11 @@ function applyTheme(c){
 Object.keys(S).forEach(c=>{const b=document.createElement('button');b.className='chip';b.textContent=c;b.onclick=()=>pick(c);$('chips').appendChild(b)});
 
 function pick(c){
-  cls=c;$('badge').textContent='শ্রেণি: '+c;$('date').value=today();
+  cls=c;$('badge').textContent='Class: '+c;$('date').value=today();
   const box=$('subs');box.innerHTML='';
   S[c].forEach((s,i)=>{
     const r=document.createElement('div');r.className='row';
-    r.innerHTML='<label></label><input type="text" placeholder="যেমন: ১-৫ পৃষ্ঠা" autocomplete="off">';
+    r.innerHTML='<label></label><input type="text" placeholder="e.g. Page 1-5" autocomplete="off">';
     r.firstChild.textContent=s;const inp=r.lastChild;inp.dataset.s=s;
     inp.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();const n=box.querySelectorAll('input')[i+1];n?n.focus():preview()}};
     box.appendChild(r)});
@@ -291,10 +297,10 @@ function pick(c){
 function toClass(){show('s1')}
 
 function preview(){
-  applyTheme(cls); /* 🎨 ক্লাস অনুযায়ী হেডার/ফুটারের গ্রেডিয়েন্ট সেট */
+  applyTheme(cls);
   const [y,m,d]=($('date').value||today()).split('-').map(Number);
-  $('eC').textContent='শ্রেণি: '+cls;
-  $('eD').textContent=bn(String(d).padStart(2,'0'))+' '+M[m-1]+' '+bn(y)+' | '+D[new Date(y,m-1,d).getDay()];
+  $('eC').textContent='Class: '+cls;
+  $('eD').textContent=String(d).padStart(2,'0')+' '+M[m-1]+' '+y+' | '+D[new Date(y,m-1,d).getDay()];
   const t=$('tbl');t.innerHTML='';
   const all=[...document.querySelectorAll('#subs input')];
   let rows=all.filter(i=>i.value.trim());if(!rows.length)rows=all;
@@ -327,14 +333,14 @@ async function blob(){
   cache=await new Promise(r=>c.toBlob(r,'image/png'));return cache;
 }
 async function save(){
-  try{toast('ছবি তৈরি হচ্ছে…');const b=await blob();const a=document.createElement('a');
-    a.href=URL.createObjectURL(b);a.download='syllabus-'+(cls||'class')+'.png';a.click();toast('ডাউনলোড হয়েছে')}
-  catch(e){toast('সমস্যা হয়েছে, আবার চেষ্টা করুন')}
+  try{toast('Generating image…');const b=await blob();const a=document.createElement('a');
+    a.href=URL.createObjectURL(b);a.download='agenda-'+(cls||'class')+'.png';a.click();toast('Downloaded')}
+  catch(e){toast('Something went wrong. Please try again.')}
 }
 async function share(){
-  try{const b=await blob();const f=new File([b],'syllabus.png',{type:'image/png'});
-    if(navigator.canShare&&navigator.canShare({files:[f]}))await navigator.share({files:[f],title:'দৈনিক পাঠ্যসূচি - '+cls});
-    else{save();toast('শেয়ার সমর্থিত নয়, ছবি ডাউনলোড হয়েছে')}}
+  try{const b=await blob();const f=new File([b],'agenda.png',{type:'image/png'});
+    if(navigator.canShare&&navigator.canShare({files:[f]}))await navigator.share({files:[f],title:'Daily Agenda - '+cls});
+    else{save();toast('Share not supported. Downloaded instead.')}}
   catch(e){}
 }
 show('s1');
