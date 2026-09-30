@@ -290,6 +290,34 @@ function bn(num){
 }
 
 /* =========================================================
+   html2canvas lazy-load + promise cache
+   ========================================================= */
+let _h2cPromise = null;
+function loadScript(src){
+  return new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = src; s.onload = resolve; s.onerror = reject;
+    document.head.appendChild(s);
+  });
+}
+function ensureHtml2Canvas(){
+  if (typeof html2canvas !== 'undefined') return Promise.resolve();
+  if (!_h2cPromise){
+    _h2cPromise = loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
+  }
+  return _h2cPromise;
+}
+
+/* =========================================================
+   ক্যানভাস ক্যাশ (শেয়ার/ডাউনলোড রিইউজ)
+   ========================================================= */
+let _cachedCanvas = null;
+function invalidateCanvasCache(){ _cachedCanvas = null; }
+
+document.getElementById('card').addEventListener('input', invalidateCanvasCache);
+window.addEventListener('resize', invalidateCanvasCache);
+
+/* =========================================================
    কার্ডকে SQUARE করা
    ========================================================= */
 function sizeCardSquare(){
@@ -414,6 +442,8 @@ function showPreview(){
     table.appendChild(tr);
   });
 
+  invalidateCanvasCache();
+
   document.getElementById('formPage').style.display = 'none';
   document.getElementById('previewPage').style.display = 'block';
   window.scrollTo(0, 0);
@@ -429,6 +459,7 @@ function showPreview(){
 
 /* =========================================================
    ১:১ কার্ডে অটো-ফিট + ভার্টিক্যাল সেন্টার
+   বাইনারি সার্চ — ~৫ reflow (আগে ~৩০)
    ========================================================= */
 function fitToSquare(){
   const card  = document.getElementById('card');
@@ -437,16 +468,20 @@ function fitToSquare(){
   const rows  = table.querySelectorAll('tr');
   if (!rows.length) return;
 
+  // সব সেল একবারে collect
+  const cells = [];
+  rows.forEach(tr => tr.querySelectorAll('td').forEach(td => cells.push(td)));
+
   table.style.transform = '';
   table.style.transformOrigin = '';
   table.style.width = '100%';
   table.style.marginTop = '0px';
-  rows.forEach(tr => tr.querySelectorAll('td').forEach(td => {
+  cells.forEach(td => {
     td.style.fontSize = '';
     td.style.paddingTop = '';
     td.style.paddingBottom = '';
-    td.style.lineHeight = '';
-  }));
+    td.style.lineHeight = '1.25';
+  });
 
   const cardPx = card.clientWidth;
   const wrapH  = wrap.clientHeight;
@@ -454,36 +489,24 @@ function fitToSquare(){
   const minFont = Math.max(6, Math.round(cardPx * 0.014));
   const maxFont = Math.round(cardPx * 0.05);
 
-  let font = maxFont;
-  let padV = Math.max(0, Math.round(cardPx * 0.004));
-
-  function apply(){
-    rows.forEach(tr => {
-      tr.querySelectorAll('td').forEach(td => {
-        td.style.fontSize = font + 'px';
-        td.style.paddingTop = padV + 'px';
-        td.style.paddingBottom = padV + 'px';
-        td.style.lineHeight = '1.25';
-      });
-    });
-  }
-  apply();
-
-  let guard = 0;
-  while (table.scrollHeight > wrapH && font > minFont && guard < 400){
-    font -= 1;
-    padV = Math.max(0, padV - 0.3);
-    apply();
-    guard++;
+  function apply(fs){
+    const pad = fs * 0.08;
+    for (let i = 0; i < cells.length; i++){
+      cells[i].style.fontSize = fs + 'px';
+      cells[i].style.paddingTop = pad + 'px';
+      cells[i].style.paddingBottom = pad + 'px';
+    }
   }
 
-  if (table.scrollHeight > wrapH){
-    rows.forEach(tr => tr.querySelectorAll('td').forEach(td => {
-      td.style.paddingTop = '0px';
-      td.style.paddingBottom = '0px';
-      td.style.lineHeight = '1.05';
-    }));
+  // বাইনারি সার্চ — সবচেয়ে বড় font যেটা wrapH-এ আঁটে
+  let lo = minFont, hi = maxFont, best = minFont;
+  while (lo <= hi){
+    const mid = (lo + hi) >> 1;
+    apply(mid);
+    if (table.scrollHeight <= wrapH){ best = mid; lo = mid + 1; }
+    else { hi = mid - 1; }
   }
+  apply(best);
 
   let currentScale = 1;
 
@@ -501,21 +524,6 @@ function fitToSquare(){
     table.style.transform = 'scale(' + scale + ')';
     table.style.width = (100 / scale) + '%';
     currentScale = scale;
-  } else {
-    guard = 0;
-    while (table.scrollHeight < wrapH * 0.86 && font < maxFont && guard < 120){
-      font += 1;
-      padV = Math.min(cardPx * 0.012, padV + 0.3);
-      apply();
-      guard++;
-    }
-    if (table.scrollHeight > wrapH){
-      const scale = wrapH / table.scrollHeight;
-      table.style.transformOrigin = 'top left';
-      table.style.transform = 'scale(' + scale + ')';
-      table.style.width = (100 / scale) + '%';
-      currentScale = scale;
-    }
   }
 
   const visualH = table.scrollHeight * currentScale;
@@ -604,6 +612,9 @@ function restoreAfterCapture(orig){
    ছবি তৈরি
    ========================================================= */
 async function generateCanvas(){
+  // ক্যাশ হিট
+  if (_cachedCanvas) return _cachedCanvas;
+
   const card = document.getElementById('card');
   const bar = document.querySelector('.action-bar');
   const backBtn = document.getElementById('backBtn');
@@ -621,31 +632,25 @@ async function generateCanvas(){
   editables.forEach(el => el.style.background = 'transparent');
 
   sizeCardSquare();
-  await new Promise(r => setTimeout(r, 80));
+  await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
   fitToSquare();
-  await new Promise(r => setTimeout(r, 80));
 
   const baked = bakeScaleForCapture();
-  await new Promise(r => setTimeout(r, 120));
+  await new Promise(r => requestAnimationFrame(r));
 
   try {
-    if (typeof html2canvas === 'undefined'){
-      await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
-    }
+    await ensureHtml2Canvas();
 
-    if (document.fonts){
-      try {
-        await document.fonts.load('16px Kalpurush');
-        await document.fonts.load('bold 16px Kalpurush');
-        await document.fonts.ready;
-      } catch(e){}
+    // ফন্ট আগেই লোড করা থাকলে এটা তৎক্ষণাৎ resolve হবে
+    if (document.fonts && document.fonts.status !== 'loaded'){
+      try { await document.fonts.ready; } catch(e){}
     }
-    await new Promise(r => setTimeout(r, 300));
 
     const w = card.offsetWidth;
     const h = card.offsetHeight;
-    const TARGET = 1440;
-    const scale = Math.max(4, TARGET / w);
+    // পুরনো: Math.max(4, 1440/w) → ৫ মেগাপিক্সেল
+    // নতুন: সর্বোচ্চ ৩x, যা দরকার ততটুকুই
+    const scale = Math.min(3, 1440 / w);
 
     const canvas = await html2canvas(card, {
       scale: scale,
@@ -675,6 +680,8 @@ async function generateCanvas(){
     bar.style.display = 'flex';
     backBtn.style.display = 'flex';
     hint.style.display = 'flex';
+
+    _cachedCanvas = canvas;
     return canvas;
   } catch (err){
     restoreAfterCapture(baked);
@@ -689,10 +696,15 @@ async function generateCanvas(){
 async function downloadImage(){
   const canvas = await generateCanvas();
   if (!canvas) return;
-  const link = document.createElement('a');
-  link.download = 'syllabus.png';
-  link.href = canvas.toDataURL('image/png', 1.0);
-  link.click();
+  // toBlob — মেইন থ্রেড ব্লক করে না (আগে toDataURL ছিল)
+  canvas.toBlob((blob) => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.download = 'syllabus.png';
+    a.href = url;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+  }, 'image/png');
 }
 
 async function shareImage(){
@@ -712,12 +724,15 @@ async function shareImage(){
   }, "image/png", 1.0);
 }
 
-function loadScript(src){
-  return new Promise((resolve, reject) => {
-    const s = document.createElement('script');
-    s.src = src; s.onload = resolve; s.onerror = reject;
-    document.head.appendChild(s);
-  });
+/* =========================================================
+   প্রিলোড — ব্যবহারকারী ফর্ম ভরাচ্ছেন এমন সময়েই লোড হয়ে যাবে
+   ========================================================= */
+ensureHtml2Canvas().catch(()=>{});
+if (document.fonts){
+  try {
+    document.fonts.load('16px Kalpurush');
+    document.fonts.load('bold 16px Kalpurush');
+  } catch(e){}
 }
 </script>
 
