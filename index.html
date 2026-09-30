@@ -7,29 +7,98 @@
 <link rel="preconnect" href="https://fonts.maateen.me">
 <link href="https://fonts.maateen.me/kalpurush/font.css" rel="stylesheet">
 <style>
-:root{--b:#4a72d4;--b2:#6b8fe6;--bd:#3a5cb8;--t:#eef3ff;--t2:#f8faff;--bg:#f7f9fd;--ink:#2a3555;--mute:#7a869f;--line:#e4ebf7}
+:root{
+  --b:#4a72d4;--b2:#6b8fe6;--bd:#3a5cb8;
+  --t:#eef3ff;--t2:#f8faff;--bg:#f7f9fd;
+  --ink:#2a3555;--mute:#7a869f;--line:#e4ebf7;
+  --neon-violet:#7C3AED;
+  --electric-cyan:#06B6D4;
+  --sunset-pink:#EC4899;
+}
 *{box-sizing:border-box;font-family:'Kalpurush',sans-serif}
-body{margin:0;background:var(--bg);color:var(--ink);padding:0 0 110px}
-.top{background:var(--b);color:#fff;padding:18px 18px 20px;border-bottom:3px solid #fff;box-shadow:0 2px 0 var(--bd);display:flex;align-items:center;gap:12px}
+body{
+  margin:0;
+  background-color:var(--bg);
+  color:var(--ink);
+  padding:0 0 110px;
+  min-height:100vh;
+  position:relative;
+  overflow-x:hidden;
+}
+
+/* ===== Fluid Mesh Gradient Background (animated) ===== */
+.bg-fluid{
+  position:fixed;inset:-10%;z-index:-1;pointer-events:none;
+  background-color:var(--bg);
+  background-image:
+    radial-gradient(at 15% 25%, var(--neon-violet) 0%, transparent 45%),
+    radial-gradient(at 85% 20%, var(--electric-cyan) 0%, transparent 45%),
+    radial-gradient(at 75% 75%, var(--sunset-pink) 0%, transparent 50%),
+    radial-gradient(at 20% 80%, var(--electric-cyan) 0%, transparent 45%),
+    radial-gradient(at 50% 50%, var(--neon-violet) 0%, transparent 60%),
+    linear-gradient(135deg, var(--neon-violet) 0%, var(--electric-cyan) 50%, var(--sunset-pink) 100%);
+  background-size:200% 200%;
+  filter:blur(50px) saturate(1.35);
+  opacity:.42;
+  animation:fluidShift 26s ease-in-out infinite;
+  will-change:transform, background-position;
+  transform:translate3d(0,0,0);
+}
+@keyframes fluidShift{
+  0%,100%{background-position:0% 0%;transform:translate3d(0,0,0) rotate(0deg) scale(1)}
+  25%{background-position:100% 0%;transform:translate3d(2%,-2%,0) rotate(3deg) scale(1.06)}
+  50%{background-position:100% 100%;transform:translate3d(-2%,2%,0) rotate(-3deg) scale(1.03)}
+  75%{background-position:0% 100%;transform:translate3d(2%,2%,0) rotate(2deg) scale(1.07)}
+}
+@media (prefers-reduced-motion: reduce){.bg-fluid{animation:none}}
+@supports (-webkit-touch-callout: none){.bg-fluid{filter:blur(60px) saturate(1.3);opacity:.4}}
+
+.top{
+  background:rgba(74,114,212,.85);
+  -webkit-backdrop-filter:blur(16px) saturate(1.4);
+  backdrop-filter:blur(16px) saturate(1.4);
+  color:#fff;padding:18px 18px 20px;
+  border-bottom:3px solid rgba(255,255,255,.9);
+  box-shadow:0 2px 0 var(--bd);
+  display:flex;align-items:center;gap:12px;
+  position:relative;z-index:2;
+}
 .top small{color:#dbe5ff;font-size:14px;display:block}
 .top h1{margin:0;font:700 24px 'Kalpurush',sans-serif}
 .top .bk{margin-left:auto;background:rgba(255,255,255,.18);color:#fff;border:none;border-radius:10px;padding:8px 12px;font-size:14px;cursor:pointer}
 .wrap{max-width:520px;margin:0 auto;padding:16px}
-.sec{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px}
+.sec{
+  background:rgba(255,255,255,.72);
+  -webkit-backdrop-filter:blur(16px) saturate(1.3);
+  backdrop-filter:blur(16px) saturate(1.3);
+  border:1px solid rgba(255,255,255,.75);
+  border-radius:14px;padding:14px;margin-bottom:14px;
+  box-shadow:0 6px 24px rgba(74,114,212,.08);
+}
 .sec h3{margin:0 0 10px;font-size:15px;font-weight:600;color:var(--b)}
 .chips{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-.chip{padding:18px 0;border:1.5px solid var(--line);border-radius:12px;background:#fff;font-size:20px;font-weight:600;cursor:pointer;color:var(--b)}
-.chip:active{background:var(--b);color:#fff}
-.badge{display:inline-block;background:var(--t);color:var(--b);border:1px solid var(--line);border-radius:20px;padding:4px 16px;font-weight:600;font-size:16px;margin-bottom:12px}
-input[type=date]{width:100%;padding:11px;border:1.5px solid var(--line);border-radius:10px;font-size:17px;background:#fff}
+.chip{padding:18px 0;border:1.5px solid var(--line);border-radius:12px;background:rgba(255,255,255,.7);font-size:20px;font-weight:600;cursor:pointer;color:var(--b);transition:transform .15s ease, background .2s ease}
+.chip:hover{background:rgba(255,255,255,.95)}
+.chip:active{background:var(--b);color:#fff;transform:scale(.97)}
+.badge{display:inline-block;background:rgba(255,255,255,.75);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);color:var(--b);border:1px solid rgba(255,255,255,.8);border-radius:20px;padding:4px 16px;font-weight:600;font-size:16px;margin-bottom:12px}
+input[type=date]{width:100%;padding:11px;border:1.5px solid var(--line);border-radius:10px;font-size:17px;background:rgba(255,255,255,.85)}
 .row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f0f4fb}
 .row:last-child{border:none}
 .row label{width:40%;font-size:15px;font-weight:500}
-.row input{flex:1;min-width:0;padding:10px;border:1.5px solid var(--line);border-radius:8px;font-size:16px}
+.row input{flex:1;min-width:0;padding:10px;border:1.5px solid var(--line);border-radius:8px;font-size:16px;background:rgba(255,255,255,.9)}
 input:focus{outline:none;border-color:var(--b2);box-shadow:0 0 0 3px rgba(107,143,230,.18)}
-.bar{position:fixed;left:0;right:0;bottom:0;padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));background:rgba(255,255,255,.96);border-top:1px solid var(--line)}
-.btn{display:block;width:100%;max-width:488px;margin:0 auto;padding:14px;border:none;border-radius:12px;background:var(--b);color:#fff;font-size:17px;font-weight:600;cursor:pointer}
-.btn.alt{background:#fff;color:var(--ink);border:1.5px solid var(--line)}
+.bar{
+  position:fixed;left:0;right:0;bottom:0;
+  padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));
+  background:rgba(255,255,255,.78);
+  -webkit-backdrop-filter:blur(18px) saturate(1.4);
+  backdrop-filter:blur(18px) saturate(1.4);
+  border-top:1px solid rgba(255,255,255,.8);z-index:5;
+}
+.btn{display:block;width:100%;max-width:488px;margin:0 auto;padding:14px;border:none;border-radius:12px;background:var(--b);color:#fff;font-size:17px;font-weight:600;cursor:pointer;transition:transform .12s ease, box-shadow .2s ease}
+.btn:hover{box-shadow:0 6px 18px rgba(74,114,212,.28)}
+.btn:active{transform:scale(.98)}
+.btn.alt{background:rgba(255,255,255,.9);color:var(--ink);border:1.5px solid var(--line)}
 #s2,#prev{display:none}
 .stage{position:relative;width:100%;overflow:hidden;border-radius:10px;box-shadow:0 8px 26px rgba(74,114,212,.18)}
 .hint{text-align:center;font-size:13px;color:var(--mute);margin:10px 0}
@@ -37,12 +106,49 @@ input:focus{outline:none;border-color:var(--b2);box-shadow:0 0 0 3px rgba(107,14
 .acts .btn{margin:0}
 
 /* ===== কার্ড (১০৮০×১০৮০) ===== */
-#card{position:absolute;top:0;left:0;width:1080px;height:1080px;background:#fff;display:flex;flex-direction:column;transform-origin:top left;color:var(--ink)}
-.ch{height:132px;background:var(--b);color:#fff;text-align:center;padding-top:12px;border-bottom:6px solid var(--bd)}
-.inst{font-size:26px;color:#dbe5ff;font-weight:500;line-height:1.2}
-.tl{display:flex;justify-content:center;align-items:center;gap:26px;margin-top:2px}
-.ttl{font:700 54px/1.25 'Kalpurush',sans-serif}
-.cls{background:#fff;color:var(--b);font-size:30px;font-weight:700;padding:0 24px;border-radius:40px;line-height:1.5}
+#card{
+  position:absolute;top:0;left:0;width:1080px;height:1080px;
+  background:#fff;display:flex;flex-direction:column;
+  transform-origin:top left;color:var(--ink);
+  --hdr-grad:linear-gradient(135deg,#7C3AED 0%,#06B6D4 55%,#EC4899 100%);
+  --ftr-grad:linear-gradient(135deg,#EC4899 0%,#06B6D4 55%,#7C3AED 100%);
+  --hdr-text:#ffffff;
+  --hdr-sub:rgba(255,255,255,.82);
+  --cls-text:#4a72d4;
+  --hdr-brd:rgba(0,0,0,.28);
+}
+
+/* 🌈 হেডার — স্ট্যাটিক মাল্টিকালার গ্রেডিয়েন্ট (ক্লাস অনুযায়ী) */
+.ch{
+  height:132px;
+  background:var(--hdr-grad);
+  color:var(--hdr-text);
+  text-align:center;
+  padding-top:12px;
+  border-bottom:6px solid var(--hdr-brd);
+  position:relative;
+  transition:background .25s ease;
+}
+.ch::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(circle at 20% 30%, rgba(255,255,255,.18), transparent 55%),
+             radial-gradient(circle at 80% 70%, rgba(255,255,255,.12), transparent 55%);
+}
+#card[data-mode="dark"] .ch::after{
+  background:radial-gradient(circle at 20% 30%, rgba(255,255,255,.35), transparent 55%),
+             radial-gradient(circle at 80% 70%, rgba(255,255,255,.22), transparent 55%);
+}
+.inst{font-size:26px;color:var(--hdr-sub);font-weight:500;line-height:1.2;position:relative;z-index:1}
+.tl{display:flex;justify-content:center;align-items:center;gap:26px;margin-top:2px;position:relative;z-index:1}
+.ttl{font:700 54px/1.25 'Kalpurush',sans-serif;color:var(--hdr-text)}
+#card[data-mode="white"] .ttl{text-shadow:0 2px 8px rgba(0,0,0,.25)}
+.cls{
+  background:#fff;color:var(--cls-text);
+  font-size:30px;font-weight:700;padding:0 24px;
+  border-radius:40px;line-height:1.5;
+  box-shadow:0 2px 10px rgba(0,0,0,.12);
+}
+
 .dt{height:62px;display:flex;justify-content:center;align-items:center;background:var(--t);color:var(--bd);font-size:30px;font-weight:600;border-bottom:1px solid var(--line)}
 #body{flex:1;display:flex;align-items:center;padding:14px 56px;overflow:hidden}
 #tbl{width:100%;border-collapse:collapse;table-layout:fixed}
@@ -50,9 +156,32 @@ input:focus{outline:none;border-color:var(--b2);box-shadow:0 0 0 3px rgba(107,14
 #tbl tr{border-bottom:1px solid #eef3fb}
 #tbl td{vertical-align:middle;line-height:1.3}
 #tbl td:first-child{width:38%;color:var(--b);font-weight:600;border-left:6px solid var(--b)}
-.cf{height:86px;background:var(--b);color:#fff;text-align:center;display:flex;flex-direction:column;justify-content:center;border-top:5px solid var(--bd)}
-.cf b{font-size:28px;font-weight:600}
-.cf span{font-size:19px;color:#dbe5ff;margin-top:2px}
+
+/* 🌈 ফুটার — স্ট্যাটিক মাল্টিকালার গ্রেডিয়েন্ট (ক্লাস অনুযায়ী উল্টো দিক) */
+.cf{
+  height:86px;
+  background:var(--ftr-grad);
+  color:var(--hdr-text);
+  text-align:center;
+  display:flex;flex-direction:column;justify-content:center;
+  border-top:5px solid var(--hdr-brd);
+  position:relative;
+  transition:background .25s ease;
+}
+.cf::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(circle at 25% 40%, rgba(255,255,255,.15), transparent 55%),
+             radial-gradient(circle at 75% 60%, rgba(255,255,255,.1), transparent 55%);
+}
+#card[data-mode="dark"] .cf::after{
+  background:radial-gradient(circle at 25% 40%, rgba(255,255,255,.3), transparent 55%),
+             radial-gradient(circle at 75% 60%, rgba(255,255,255,.2), transparent 55%);
+}
+.cf b{font-size:28px;font-weight:600;position:relative;z-index:1;color:var(--hdr-text)}
+.cf span{font-size:19px;color:var(--hdr-sub);margin-top:2px;position:relative;z-index:1}
+#card[data-mode="white"] .cf b,
+#card[data-mode="white"] .cf span{text-shadow:0 1px 4px rgba(0,0,0,.25)}
+
 [contenteditable]{outline:none}
 [contenteditable]:focus{background:rgba(107,143,230,.16);border-radius:6px}
 #toast{position:fixed;top:16px;left:50%;transform:translate(-50%,-80px);background:var(--ink);color:#fff;padding:10px 18px;border-radius:24px;font-size:14px;transition:transform .3s;z-index:9}
@@ -60,6 +189,8 @@ input:focus{outline:none;border-color:var(--b2);box-shadow:0 0 0 3px rgba(107,14
 </style>
 </head>
 <body>
+
+<div class="bg-fluid" aria-hidden="true"></div>
 
 <div id="s1">
   <div class="top"><div><small>দারুল হিকমাহ মডেল মাদ্রাসা</small><h1>দৈনিক পাঠ্যসূচি</h1></div></div>
@@ -104,6 +235,24 @@ const S={"প্লে":["কোরআন","আরবি","ইংরেজি","
 "চতুর্থ":["ইংরেজি ১ম","ইংরেজি ২য়","বিজ্ঞান","বাংলাদেশ ও বিশ্বপরিচয়","বাংলা","এসো জীবন গড়ি","কোরআন ও আকাইদ","আরবি ১ম","আরবি ২য়","তালিমুল কোরআন","কোরআন","গণিত","সাধারণ জ্ঞান","কম্পিউটার"],
 "পঞ্চম":["আরবি ১ম","আরবি ২য়","ইংরেজি","বাংলা ১ম","বাংলা ২য়","বিজ্ঞান","বাংলাদেশ ও বিশ্বপরিচয়","গণিত","কোরআন"],
 "ষষ্ঠ":["আরবি ১ম","কোরআন ও আকাইদ","কৃষি","তথ্য প্রযুক্তি","ইংরেজি ১ম","ইংরেজি ২য়","বাংলা ১ম","বাংলা ২য়","বিজ্ঞান","বাংলাদেশ ও বিশ্বপরিচয়","আরবি ২য়","গণিত"]};
+
+/* 🎨 প্রতিটি শ্রেণির জন্য আলাদা ৩টি রঙ
+   ফরম্যাট: [c1, c2, c3, textMode, badgeText]
+   textMode: "white" মানে সাদা টেক্সট, "dark" মানে কালো টেক্সট */
+
+/* 🎨 প্রতিটি শ্রেণির জন্য আলাদা ৩টি রঙ
+   ফরম্যাট: [c1, c2, c3, textMode, badgeText] */
+const THEME = {
+  "প্লে":     ["#F3B0C3","#FCE38A","#95E1D3","dark", "#C2185B"],  // 🌈 পেস্টেল রংধনু
+  "নার্সারি": ["#74EBD5","#9FA8DA","#ACB6E5","dark", "#5C6BC0"],
+  "প্রথম":    ["#6b0f87","#4d47ba","#0f6787","white","#4d47ba"],
+  "দ্বিতীয়":  ["#0A192F","#1E40AF","#00F2FE","white","#1E40AF"],
+  "তৃতীয়":   ["#E65C00","#F9D423","#FFF6E5","dark", "#E65C00"],
+  "চতুর্থ":   ["#4B0082","#8A2BE2","#E040FB","white","#8A2BE2"],
+  "পঞ্চম":    ["#004D40","#009688","#80CBC4","white","#00796B"],
+  "ষষ্ঠ":     ["#0F2027","#203A43","#2C5364","white","#203A43"]
+};
+
 const M=["জানুয়ারি","ফেব্রুয়ারি","মার্চ","এপ্রিল","মে","জুন","জুলাই","আগস্ট","সেপ্টেম্বর","অক্টোবর","নভেম্বর","ডিসেম্বর"];
 const D=["রবিবার","সোমবার","মঙ্গলবার","বুধবার","বৃহস্পতিবার","শুক্রবার","শনিবার"];
 const $=id=>document.getElementById(id);
@@ -112,6 +261,20 @@ const show=id=>{['s1','s2','prev'].forEach(x=>$(x).style.display=x===id?'block':
 let cls='',cache=null;
 function toast(m){const t=$('toast');t.textContent=m;t.classList.add('s');setTimeout(()=>t.classList.remove('s'),2000)}
 function today(){const n=new Date();return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0')}
+
+/* 🎨 ক্লাস অনুযায়ী কার্ডের থিম (হেডার + ফুটার) প্রয়োগ */
+function applyTheme(c){
+  const t = THEME[c]; if(!t) return;
+  const [c1,c2,c3,mode,badgeTxt] = t;
+  const card = $('card');
+  card.style.setProperty('--hdr-grad', `linear-gradient(135deg, ${c1} 0%, ${c2} 55%, ${c3} 100%)`);
+  card.style.setProperty('--ftr-grad', `linear-gradient(135deg, ${c3} 0%, ${c2} 45%, ${c1} 100%)`);
+  card.style.setProperty('--hdr-text', mode==='white' ? '#ffffff' : '#1a1a1a');
+  card.style.setProperty('--hdr-sub', mode==='white' ? 'rgba(255,255,255,.85)' : 'rgba(0,0,0,.68)');
+  card.style.setProperty('--cls-text', badgeTxt || c1);
+  card.style.setProperty('--hdr-brd', mode==='white' ? 'rgba(0,0,0,.28)' : 'rgba(0,0,0,.18)');
+  card.dataset.mode = mode;
+}
 
 Object.keys(S).forEach(c=>{const b=document.createElement('button');b.className='chip';b.textContent=c;b.onclick=()=>pick(c);$('chips').appendChild(b)});
 
@@ -129,6 +292,7 @@ function pick(c){
 function toClass(){show('s1')}
 
 function preview(){
+  applyTheme(cls); /* 🎨 ক্লাস অনুযায়ী হেডার/ফুটারের গ্রেডিয়েন্ট সেট */
   const [y,m,d]=($('date').value||today()).split('-').map(Number);
   $('eC').textContent='শ্রেণি: '+cls;
   $('eD').textContent=bn(String(d).padStart(2,'0'))+' '+M[m-1]+' '+bn(y)+' | '+D[new Date(y,m-1,d).getDay()];
@@ -165,12 +329,12 @@ async function blob(){
 }
 async function save(){
   try{toast('ছবি তৈরি হচ্ছে…');const b=await blob();const a=document.createElement('a');
-    a.href=URL.createObjectURL(b);a.download='syllabus.png';a.click();toast('ডাউনলোড হয়েছে')}
+    a.href=URL.createObjectURL(b);a.download='syllabus-'+(cls||'class')+'.png';a.click();toast('ডাউনলোড হয়েছে')}
   catch(e){toast('সমস্যা হয়েছে, আবার চেষ্টা করুন')}
 }
 async function share(){
   try{const b=await blob();const f=new File([b],'syllabus.png',{type:'image/png'});
-    if(navigator.canShare&&navigator.canShare({files:[f]}))await navigator.share({files:[f],title:'দৈনিক পাঠ্যসূচি'});
+    if(navigator.canShare&&navigator.canShare({files:[f]}))await navigator.share({files:[f],title:'দৈনিক পাঠ্যসূচি - '+cls});
     else{save();toast('শেয়ার সমর্থিত নয়, ছবি ডাউনলোড হয়েছে')}}
   catch(e){}
 }
