@@ -307,9 +307,9 @@ function preview(){
   $('eD').textContent=bn(String(d).padStart(2,'0'))+' '+M[m-1]+' '+bn(y)+' | '+D[new Date(y,m-1,d).getDay()];
   const t=$('tbl');t.innerHTML='';
   const all=[...document.querySelectorAll('#subs input')];
-  let rows=all.filter(i=>i.value.trim());if(!rows.length)rows=all;
+  let rows=all;
   rows.forEach(i=>{const tr=document.createElement('tr');tr.innerHTML='<td></td><td contenteditable="true"></td>';
-    tr.children[0].textContent=i.dataset.s+':';tr.children[1].textContent=i.value.trim()||'—';t.appendChild(tr)});
+    tr.children[0].textContent=i.dataset.s+':';tr.children[1].textContent=i.value.trim()||' ';t.appendChild(tr)});
   show('prev');cache=null;
   requestAnimationFrame(()=>{scale();fit()});
   if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{scale();fit()});
