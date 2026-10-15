@@ -189,6 +189,134 @@ input:focus{outline:none;border-color:var(--b2);box-shadow:0 0 0 3px rgba(107,14
 [contenteditable]:focus{background:rgba(107,143,230,.16);border-radius:6px}
 #toast{position:fixed;top:16px;left:50%;transform:translate(-50%,-80px);background:var(--ink);color:#fff;padding:10px 18px;border-radius:24px;font-size:14px;transition:transform .3s;z-index:9}
 #toast.s{transform:translate(-50%,0)}
+
+/* ===== Refined visual polish: clean, calm and mobile-first ===== */
+:root{
+  --b:#2563a6;
+  --b2:#4b91d0;
+  --bd:#174b7c;
+  --t:#edf6ff;
+  --t2:#f7fbff;
+  --bg:#f3f7fc;
+  --ink:#20334a;
+  --mute:#718198;
+  --line:#dce7f3;
+}
+body{
+  background:linear-gradient(180deg,#f7faff 0%,#eef5fc 100%);
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+}
+.bg-fluid{
+  background-image:
+    radial-gradient(at 8% 8%,rgba(37,99,166,.22) 0%,transparent 42%),
+    radial-gradient(at 92% 18%,rgba(14,165,160,.16) 0%,transparent 40%),
+    radial-gradient(at 78% 92%,rgba(96,165,250,.16) 0%,transparent 42%);
+  filter:blur(42px);
+  opacity:.48;
+  animation-duration:34s;
+}
+.top{
+  background:linear-gradient(125deg,#174b7c 0%,#2563a6 58%,#168b91 100%);
+  border-bottom:0;
+  box-shadow:0 8px 24px rgba(23,75,124,.16);
+  padding:20px 18px 22px;
+}
+.top h1{font-size:27px;letter-spacing:.1px}
+.top small{color:rgba(255,255,255,.82)}
+.top .bk{
+  border:1px solid rgba(255,255,255,.24);
+  box-shadow:inset 0 1px rgba(255,255,255,.14);
+  transition:background .2s,transform .15s;
+}
+.top .bk:hover{background:rgba(255,255,255,.28)}
+.wrap{max-width:560px;padding:18px 16px}
+.sec{
+  background:rgba(255,255,255,.88);
+  border:1px solid rgba(219,231,244,.95);
+  border-radius:18px;
+  padding:17px;
+  box-shadow:0 8px 28px rgba(32,65,105,.065);
+  -webkit-backdrop-filter:blur(12px);
+  backdrop-filter:blur(12px);
+}
+.sec h3{color:#285d91;font-size:16px;margin-bottom:13px}
+.chips{gap:11px}
+.chip{
+  min-height:64px;
+  padding:16px 10px;
+  border:1px solid #d9e6f4;
+  border-radius:15px;
+  background:linear-gradient(180deg,#fff 0%,#f8fbff 100%);
+  color:#285d91;
+  box-shadow:0 2px 5px rgba(32,65,105,.025);
+  transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease,background .18s ease;
+}
+.chip:hover{
+  border-color:#9ec5e8;
+  box-shadow:0 7px 16px rgba(37,99,166,.09);
+  transform:translateY(-1px);
+}
+.chip:focus-visible,.btn:focus-visible,.bk:focus-visible{
+  outline:3px solid rgba(75,145,208,.45);
+  outline-offset:3px;
+}
+.chip:active{background:#2563a6;color:#fff;transform:scale(.985)}
+.badge{
+  background:#e7f2ff;
+  border:1px solid #cfe4fa;
+  color:#245d94;
+  border-radius:999px;
+  padding:7px 16px;
+  box-shadow:0 3px 10px rgba(37,99,166,.05);
+}
+input[type=date],.row input{
+  border:1px solid #d8e4f1;
+  border-radius:11px;
+  color:var(--ink);
+  box-shadow:0 1px 2px rgba(25,50,80,.025);
+  transition:border-color .18s,box-shadow .18s;
+}
+input[type=date]:focus,.row input:focus{
+  outline:none;
+  border-color:#5a9bd5;
+  box-shadow:0 0 0 4px rgba(75,145,208,.13);
+}
+.row{border-bottom-color:#eaf0f7;padding:10px 0}
+.row label{color:#40546d}
+.bar{
+  background:rgba(250,253,255,.9);
+  border-top:1px solid #dce7f3;
+  box-shadow:0 -8px 24px rgba(32,65,105,.06);
+}
+.btn{
+  border-radius:13px;
+  background:linear-gradient(120deg,#245f9c,#287eb0);
+  box-shadow:0 5px 14px rgba(37,99,166,.16);
+  letter-spacing:.1px;
+}
+.btn:hover{box-shadow:0 8px 20px rgba(37,99,166,.24)}
+.btn.alt{
+  background:#fff;
+  color:#31506f;
+  border:1px solid #dce7f3;
+  box-shadow:none;
+}
+.btn.alt:hover{background:#f6faff;border-color:#b9d1e8}
+.stage{border-radius:15px;box-shadow:0 12px 32px rgba(23,75,124,.16)}
+.hint{color:#718198;line-height:1.6}
+#toast{box-shadow:0 8px 24px rgba(22,42,65,.2)}
+@media(max-width:380px){
+  .top{padding:17px 15px}
+  .top h1{font-size:24px}
+  .wrap{padding:14px 12px}
+  .sec{padding:14px;border-radius:16px}
+  .chip{font-size:18px;min-height:58px}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{scroll-behavior:auto!important;transition:none!important}
+}
+
 </style>
 </head>
 <body>
